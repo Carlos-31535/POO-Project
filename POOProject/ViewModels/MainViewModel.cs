@@ -19,7 +19,7 @@ namespace POOProject.ViewModels
         #region Fields
 
         private readonly IViewFactory _viewFactory;
-        private readonly IEmployeeRepository _repository;
+        
 
         #endregion
 
@@ -47,9 +47,9 @@ namespace POOProject.ViewModels
         /// Initializes a new instance of <see cref="MainViewModel"/>.
         /// </summary>
         /// <param name="viewFactory">The factory to create views for navigation.</param>
-        public MainViewModel(IViewFactory viewFactory, IEmployeeRepository repository)
+        public MainViewModel(IViewFactory viewFactory)
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+
             _viewFactory = viewFactory ?? throw new ArgumentNullException(nameof(viewFactory));
 
             // CreateCommand = new ViewModelCommand(ExecuteCreateCommand);
@@ -61,9 +61,9 @@ namespace POOProject.ViewModels
             Funcionarios = new ObservableCollection<Funcionario>();
 
             // CORREÇÃO: Usar o construtor da tua classe Funcionario (Nome, Apelido, ID)
-            Funcionarios.Add(new Funcionario("João", "Silva", 1));
-            Funcionarios.Add(new Funcionario("Maria", "Santos", 2));
-            Funcionarios.Add(new Funcionario("Pedro", "Ferreira", 3));
+            //Funcionarios.Add(new Funcionario("João", "Silva", 1));
+            //Funcionarios.Add(new Funcionario("Maria", "Santos", 2));
+            //Funcionarios.Add(new Funcionario("Pedro", "Ferreira", 3));
 
             // O comando de editar agora recebe um Funcionario
             EditCommand = new RelayCommand<Funcionario>(EditEmployee);

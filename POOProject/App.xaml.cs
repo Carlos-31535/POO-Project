@@ -45,6 +45,7 @@ namespace POOProject
                 .AddTransient<RegistryWindow>()
                 .AddTransient<MainWindow>()
                 .AddTransient<AddArranjoWindow>()
+                
 
                 // Finaliza
                 .BuildServiceProvider();

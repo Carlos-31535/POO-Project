@@ -8,8 +8,8 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid Margin="10">
         <DataGrid ItemsSource="{Binding Employees}" Name="dgSimple">
-            <!--<DataGrid.Columns>
-                --><!-- EDIT BUTTON COLUMN --><!--
+            <DataGrid.Columns>
+                
                 <DataGridTemplateColumn Header="Actions">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -20,7 +20,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-            </DataGrid.Columns>-->
+            </DataGrid.Columns>
         </DataGrid>
     </Grid>
 </Window>

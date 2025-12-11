@@ -28,6 +28,8 @@ namespace POOProject.Views.Enums
         /// </summary>
         EditEmployee,
 
+        Window1,
+
 
         AddArranjo
         // TODO: Add more view types here as needed.

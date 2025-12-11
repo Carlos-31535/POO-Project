@@ -1,6 +1,7 @@
 ﻿
-using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using POOProject.ViewModels;
+using System.Windows;
 
 namespace POOProject.Views
 {
@@ -10,6 +11,7 @@ namespace POOProject.Views
     /// </summary>
     public partial class RegistryWindow : Window
     {
+        private readonly RegistryViewModel RegistryView;
         #region Constructors
 
         /// <summary>
@@ -18,7 +20,9 @@ namespace POOProject.Views
         /// </summary>
         public RegistryWindow()
         {
+            RegistryView = App.ServiceProvider.GetRequiredService<RegistryViewModel>();
             InitializeComponent();
+            DataContext = RegistryView;
         }
 
         #endregion

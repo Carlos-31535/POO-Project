@@ -11,6 +11,7 @@ namespace POOProject.Views
     /// </summary>
     public partial class LoginWindow : Window
     {
+        private readonly LoginViewModel loginView;
         #region Constructors
 
         /// <summary>
@@ -19,7 +20,9 @@ namespace POOProject.Views
         /// </summary>
         public LoginWindow()
         {
+            loginView = App.ServiceProvider.GetRequiredService<LoginViewModel>();
             InitializeComponent();
+            DataContext = loginView;
         }
 
         #endregion
