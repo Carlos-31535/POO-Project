@@ -1,0 +1,137 @@
+﻿//-----------------------------------------------------------------
+//    <copyright file="Helper.cs" company="IPCA">
+//     Copyright IPCA-EST. All rights reserved.
+//    </copyright>
+//    <date>13-10-2025</date>
+//    <time>21:00</time>
+//    <version>0.1</version>
+//    <author>Ernesto Casanova</author>
+//-----------------------------------------------------------------
+
+using System.Windows;
+using System.Windows.Input;
+using POOProject.ViewModels.Commands;
+using POOProject.ViewModels.Interfaces;
+using POOProject.Views.Enums;
+using POOProject.Views.Interfaces;
+using POOProject.ViewModels;
+
+namespace POOProject.ViewModels
+{
+    /// <summary>
+    /// ViewModel for login functionality. Handles authentication and navigation.
+    /// </summary>
+    public class RegistryViewModel : BaseViewModel
+    {
+        #region Fields
+
+        private readonly IAuthenticationService _authenticationService;
+        private readonly IViewFactory _viewFactory;
+        private string _username = string.Empty;
+        private string _password = string.Empty;
+        private string _passwordRepeat = string.Empty;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Action to hide the associated window. Typically set by the view.
+        /// </summary>
+        public Action? HideWindowAction { get; set; }
+
+        /// <summary>
+        /// Command for executing the registry action.
+        /// </summary>
+        public ICommand RegistryCommand { get; }
+
+        /// <summary>
+        /// Gets or sets the username entered by the user.
+        /// </summary>
+        public string Username
+        {
+            get => _username;
+            set
+            {
+                if (_username != value)
+                {
+                    _username = value;
+                    OnPropertyChanged(nameof(Username));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the password entered by the user.
+        /// </summary>
+        public string Password
+        {
+            get => _password;
+            set
+            {
+                if (_password != value)
+                {
+                    _password = value;
+                    OnPropertyChanged(nameof(Password));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the repeat password entered by the user.
+        /// </summary>
+        public string PasswordRepeat
+        {
+            get => _passwordRepeat;
+            set
+            {
+                if (_passwordRepeat != value)
+                {
+                    _passwordRepeat = value;
+                    OnPropertyChanged(nameof(PasswordRepeat));
+                }
+            }
+        }
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="LoginViewModel"/>.
+        /// </summary>
+        /// <param name="authenticationService">The authentication service to validate users.</param>
+        /// <param name="viewFactory">The factory to create views for navigation.</param>
+        public RegistryViewModel(IAuthenticationService authenticationService, IViewFactory viewFactory)
+        {
+            _viewFactory = viewFactory ?? throw new ArgumentNullException(nameof(viewFactory));
+            _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
+
+            RegistryCommand = new ViewModelCommand(ExecuteRegistryCommand);
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Executes the login command, validating credentials and navigating to the main view if successful.
+        /// </summary>
+        /// <param name="parameter">Optional command parameter (not used).</param>
+        private void ExecuteRegistryCommand(object parameter)
+        {
+            if (_authenticationService.CreateUser(Username, Password, PasswordRepeat))
+            {
+                Window window = _viewFactory.ShowDialog(ViewType.Login);
+                HideWindowAction?.Invoke();
+                window.Show();
+            }
+            else
+            {
+                MessageBox.Show("Invalid username or password.", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        #endregion
+    }
+}
