@@ -1,4 +1,4 @@
-﻿using POOProject.Models.Emuns; // Nota: Mantive o typo "Emuns" do teu ficheiro original
+﻿using POOProject.Models.Emuns; 
 using POOProject.ViewModels;
 using System;
 using System.Collections.Generic;

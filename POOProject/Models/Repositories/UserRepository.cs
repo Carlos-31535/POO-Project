@@ -1,13 +1,4 @@
-﻿//-----------------------------------------------------------------
-//    <copyright file="Helper.cs" company="IPCA">
-//     Copyright IPCA-EST. All rights reserved.
-//    </copyright>
-//    <date>13-10-2025</date>
-//    <time>21:00</time>
-//    <version>0.1</version>
-//    <author>Ernesto Casanova</author>
-//-----------------------------------------------------------------
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 using POOProject.Models.Entities;
 using POOProject.Models.Repositories.Interfaces;

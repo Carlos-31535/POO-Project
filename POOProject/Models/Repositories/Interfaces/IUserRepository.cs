@@ -1,25 +1,4 @@
-﻿//-----------------------------------------------------------------
-//    <copyright file="Helper.cs" company="IPCA">
-//     Copyright IPCA-EST. All rights reserved.
-//    </copyright>
-//    <date>13-10-2025</date>
-//    <time>21:00</time>
-//    <version>0.1</version>
-//    <author>Ernesto Casanova</author>
-//-----------------------------------------------------------------
-
-
-//-----------------------------------------------------------------
-//    <copyright file="Helper.cs" company="IPCA">
-//     Copyright IPCA-EST. All rights reserved.
-//    </copyright>
-//    <date>13-10-2025</date>
-//    <time>21:00</time>
-//    <version>0.1</version>
-//    <author>Ernesto Casanova</author>
-//-----------------------------------------------------------------
-
-using POOProject.Models.Entities;
+﻿using POOProject.Models.Entities;
 
 namespace POOProject.Models.Repositories.Interfaces
 {
