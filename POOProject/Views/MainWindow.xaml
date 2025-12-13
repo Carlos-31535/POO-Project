@@ -5,22 +5,163 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:POOProject"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid Margin="10">
-        <DataGrid ItemsSource="{Binding Employees}" Name="dgSimple">
-            <DataGrid.Columns>
-                
-                <DataGridTemplateColumn Header="Actions">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="Edit"
-                            Padding="6 2"
-                            Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                            CommandParameter="{Binding}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        Title="Sapataria Manager" Height="600" Width="950"
+        WindowStartupLocation="CenterScreen"
+        Background="#F2F3F5">
+
+    <Window.Resources>
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#D0D0D0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="20,0,0,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderThickness="0">
+                            <ContentPresenter VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3A3E5B"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#2C2F48">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="20,30,20,40">
+                    <Border Width="40" Height="40" CornerRadius="20" Background="#009688" Margin="0,0,10,0">
+                        <TextBlock Text="S" Foreground="White" FontWeight="Bold" FontSize="20" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Rapido Sousa" Foreground="White" FontSize="16" FontWeight="Bold"/>
+                        <TextBlock Text="Versºao 1.0" Foreground="#888" FontSize="10"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Style="{StaticResource MenuButtonStyle}" Command="{Binding OpenArranjoCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="➕" Margin="0,0,15,0"/>
+                        <TextBlock Text="Novo Arranjo"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MenuButtonStyle}" Command="{Binding ShowPendingArranjoCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🔨" Margin="0,0,15,0"/>
+                        <TextBlock Text="Por Arranjar"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MenuButtonStyle}" Command="{Binding ShowFinishedArranjoCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="✅" Margin="0,0,15,0"/>
+                        <TextBlock Text="Arranjos Prontos"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MenuButtonStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="👥" Margin="0,0,15,0"/>
+                        <TextBlock Text="Funcionários"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MenuButtonStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📦" Margin="0,0,15,0"/>
+                        <TextBlock Text="Stocks / Produtos"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MenuButtonStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⚙️" Margin="0,0,15,0"/>
+                        <TextBlock Text="Definições"/>
+                    </StackPanel>
+                </Button>
+
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="#009688">
+                <Grid>
+                    <TextBlock Text="HOME" Foreground="White" 
+                               HorizontalAlignment="Center" VerticalAlignment="Center" 
+                               FontSize="16" FontWeight="Bold"/>
+
+                    <TextBlock Text="Bem-vindo" Foreground="White" 
+                               HorizontalAlignment="Right" VerticalAlignment="Center" 
+                               Margin="0,0,20,0" FontSize="12"/>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1" Margin="20">
+
+                <Border Background="White" CornerRadius="10" Padding="15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Lista de Funcionários" FontSize="18" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,15"/>
+
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding Funcionarios}" AutoGenerateColumns="False" 
+                                  CanUserAddRows="False" BorderThickness="0" Background="White" HeadersVisibility="Column">
+
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Padding" Value="10,5,10,5"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                                <DataGridTextColumn Header="Nome" Binding="{Binding FirstName}" Width="*"/>
+                                <DataGridTextColumn Header="Apelido" Binding="{Binding LastName}" Width="*"/>
+                                <DataGridTemplateColumn Header="Ações" Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="✏️" 
+                                                    Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                    CommandParameter="{Binding}"
+                                                    Background="Transparent" BorderThickness="0" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

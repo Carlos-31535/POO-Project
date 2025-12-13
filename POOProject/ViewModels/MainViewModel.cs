@@ -33,10 +33,11 @@ namespace POOProject.ViewModels
         public ICommand CreateCommand { get; }
         public ICommand EditCommand { get; }
 
-        // Comando novo para abrir os arranjos
+        // Comando para abrir os arranjos
         public ICommand OpenArranjoCommand { get; }
 
-        // CORREÇÃO: Usar Funcionario em vez de Employee
+        public ICommand ShowPendingArranjoCommand { get; }  
+        public ICommand ShowFinishedArranjoCommand { get; } 
         public ObservableCollection<Funcionario> Funcionarios { get; set; }
 
         #endregion
@@ -56,14 +57,13 @@ namespace POOProject.ViewModels
 
             // Inicializar o comando de abrir arranjos
             OpenArranjoCommand = new ViewModelCommand(ExecuteOpenArranjo);
+            ShowPendingArranjoCommand = new ViewModelCommand(ExecuteShowPendingArranjo);
+            ShowFinishedArranjoCommand = new ViewModelCommand(ExecuteShowFinishedArranjo);
 
             // Inicializar a lista de Funcionários com dados de teste
             Funcionarios = new ObservableCollection<Funcionario>();
 
-            // CORREÇÃO: Usar o construtor da tua classe Funcionario (Nome, Apelido, ID)
-            //Funcionarios.Add(new Funcionario("João", "Silva", 1));
-            //Funcionarios.Add(new Funcionario("Maria", "Santos", 2));
-            //Funcionarios.Add(new Funcionario("Pedro", "Ferreira", 3));
+
 
             // O comando de editar agora recebe um Funcionario
             EditCommand = new RelayCommand<Funcionario>(EditEmployee);
@@ -91,6 +91,16 @@ namespace POOProject.ViewModels
             // Nota: Verifica se tens ViewType.EditEmployee no teu Enum
             Window window = _viewFactory.ShowDialog(ViewType.EditEmployee, funcionario);
             window?.Show();
+        }
+
+        private void ExecuteShowPendingArranjo(object? obj)
+        {
+            
+        }
+
+        private void ExecuteShowFinishedArranjo(object? obj)
+        {
+            
         }
 
         #endregion
