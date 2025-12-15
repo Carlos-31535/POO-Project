@@ -5,6 +5,7 @@ using POOProject.ViewModels;
 using POOProject.ViewModels.Interfaces;
 using POOProject.ViewModels.Services;
 using POOProject.Views;
+using POOProject.Views.Enums;
 using POOProject.Views.Factories;
 using POOProject.Views.Interfaces;
 using System.Configuration;
@@ -55,6 +56,11 @@ namespace POOProject
         {
             base.OnStartup(e);
             LoadServiceProvider();
+
+            var viewFactory = ServiceProvider.GetRequiredService<IViewFactory>();
+
+            var loginWindow = viewFactory.ShowDialog(ViewType.Login);
+            loginWindow.Show();
         }
     }
 
