@@ -11,5 +11,7 @@ namespace POOProject.Models.Repositories.Interfaces
     {
         void SaveArranjo(Arranjo arranjo);
         List<Arranjo> GetAllArranjos();
+
+        void Update(Arranjo arranjo);
     }
 }

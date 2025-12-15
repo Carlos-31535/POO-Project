@@ -10,6 +10,8 @@
         Background="#F2F3F5">
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
         <Style x:Key="MenuButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#D0D0D0"/>
@@ -48,12 +50,12 @@
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="20,30,20,40">
                     <Border Width="40" Height="40" CornerRadius="20" Background="#009688" Margin="0,0,10,0">
-                        <TextBlock Text="S" Foreground="White" FontWeight="Bold" FontSize="20" 
+                        <TextBlock Text="RS" Foreground="White" FontWeight="Bold" FontSize="20" 
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="Rapido Sousa" Foreground="White" FontSize="16" FontWeight="Bold"/>
-                        <TextBlock Text="Versºao 1.0" Foreground="#888" FontSize="10"/>
+                        <TextBlock Text="Versão 1.0" Foreground="#888" FontSize="10"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -78,7 +80,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Style="{StaticResource MenuButtonStyle}">
+                <Button Style="{StaticResource MenuButtonStyle}" Command="{Binding ShowFuncionariosCommand}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="👥" Margin="0,0,15,0"/>
                         <TextBlock Text="Funcionários"/>
@@ -98,7 +100,6 @@
                         <TextBlock Text="Definições"/>
                     </StackPanel>
                 </Button>
-
             </StackPanel>
         </Border>
 
@@ -110,57 +111,79 @@
 
             <Border Grid.Row="0" Background="#009688">
                 <Grid>
-                    <TextBlock Text="HOME" Foreground="White" 
-                               HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontSize="16" FontWeight="Bold"/>
-
-                    <TextBlock Text="Bem-vindo" Foreground="White" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" 
-                               Margin="0,0,20,0" FontSize="12"/>
+                    <TextBlock Text="HOME" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
+                    <TextBlock Text="Bem-vindo" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0"/>
                 </Grid>
             </Border>
 
             <Grid Grid.Row="1" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <Border Background="White" CornerRadius="10" Padding="15">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="{Binding TituloTabela}" FontSize="18" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,15"/>
 
-                        <TextBlock Text="Lista de Funcionários" FontSize="18" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,15"/>
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Funcionarios}" 
+                          Visibility="{Binding IsFuncionariosVisible, Converter={StaticResource BoolToVis}}"
+                          AutoGenerateColumns="False" CanUserAddRows="False" 
+                          BorderThickness="0" Background="White" HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                        <DataGridTextColumn Header="Nome" Binding="{Binding FirstName}" Width="*"/>
+                        <DataGridTextColumn Header="Apelido" Binding="{Binding LastName}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
 
-                        <DataGrid Grid.Row="1" ItemsSource="{Binding Funcionarios}" AutoGenerateColumns="False" 
-                                  CanUserAddRows="False" BorderThickness="0" Background="White" HeadersVisibility="Column">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Arranjos}" 
+          Visibility="{Binding IsArranjosVisible, Converter={StaticResource BoolToVis}}"
+          AutoGenerateColumns="False" CanUserAddRows="False" 
+          BorderThickness="0" Background="White" HeadersVisibility="Column">
 
-                            <DataGrid.ColumnHeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <Setter Property="Padding" Value="10,5,10,5"/>
-                                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                                </Style>
-                            </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Nº Talão" Binding="{Binding Id}" Width="80"/>
+                        <DataGridTextColumn Header="Cliente" Binding="{Binding Cliente.FirstName}" Width="*"/>
+                        <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="150"/>
+                        <DataGridTextColumn Header="Data" Binding="{Binding DataEntrada, StringFormat=dd/MM/yyyy}" Width="100"/>
+                        <DataGridTextColumn Header="Responsável" Binding="{Binding FuncionarioResponsavel.FirstName}" Width="*"/>
 
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                                <DataGridTextColumn Header="Nome" Binding="{Binding FirstName}" Width="*"/>
-                                <DataGridTextColumn Header="Apelido" Binding="{Binding LastName}" Width="*"/>
-                                <DataGridTemplateColumn Header="Ações" Width="80">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button Content="✏️" 
-                                                    Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
-                                                    CommandParameter="{Binding}"
-                                                    Background="Transparent" BorderThickness="0" Cursor="Hand"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
-                </Border>
+                        <DataGridTemplateColumn Header="Ações" Width="160">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+
+                                        <Button Content="ℹ️" ToolTip="Ver Detalhes"
+                        Command="{Binding DataContext.ShowDetailsArranjoCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                        CommandParameter="{Binding}"
+                        Background="#2196F3" Foreground="White" FontWeight="Bold" 
+                        BorderThickness="0" Cursor="Hand" Padding="5" Margin="0,0,5,0" Width="30"/>
+
+                                        <Button Content="✅ Concluir" 
+                        Command="{Binding DataContext.MarkAsReadyCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                        CommandParameter="{Binding}"
+                        Foreground="White" FontWeight="Bold" 
+                        BorderThickness="0" Cursor="Hand" Padding="5">
+
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Background" Value="#4CAF50"/>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Estado}" Value="Pronto">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
         </Grid>
     </Grid>

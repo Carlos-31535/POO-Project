@@ -1,4 +1,4 @@
-﻿using POOProject.Models.Emuns;
+﻿using POOProject.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace POOProject.Models.Entities
         public Arranjo()
         {
             ListaCalcado = new List<Calcado>();
-            Estado = EstadoArranjo.Recebido; // Começa sempre como "Recebido"
+            Estado = EstadoArranjo.Arranjar; // Começa sempre como "Arranjar"
             DataEntrada = DateTime.Now;
         }
     }

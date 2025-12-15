@@ -1,4 +1,4 @@
-﻿using POOProject.Models.Emuns;
+﻿using POOProject.Models.Enums;
 using POOProject.Models.Entities;
 using POOProject.Models.Repositories.Interfaces;
 using POOProject.ViewModels;
@@ -104,8 +104,8 @@ namespace POOProject.ViewModels
             var novoArranjo = new Arranjo
             {
                 Cliente = new Cliente(NomeCliente, SobrenomeCliente),
-                FuncionarioResponsavel = new Funcionario("Admin", "User", 1), // TODO: Ligar ao User logado
-                Estado = EstadoArranjo.Recebido,
+                FuncionarioResponsavel = new Funcionario("Admin", "User", 1), // Trocar para marcar o user que esta a logado
+                Estado = EstadoArranjo.Arranjar,
                 DataEntrada = DateTime.Now
             };
 

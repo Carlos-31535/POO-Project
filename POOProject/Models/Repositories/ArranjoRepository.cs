@@ -43,6 +43,29 @@ namespace POOProject.Models.Repositories
             File.WriteAllText(_filePath, json);
         }
 
+        public void Update(Arranjo arranjoAtualizado)
+        {
+            var lista = GetAllArranjos();
+
+            // 1. Procura a posição do arranjo na lista pelo ID
+            int index = lista.FindIndex(a => a.Id == arranjoAtualizado.Id);
+
+            if (index != -1)
+            {
+                // 2. Substitui o antigo pelo novo (já com o estado "Pronto")
+                lista[index] = arranjoAtualizado;
+
+                // 3. Regrava o ficheiro inteiro com a alteração
+                SaveChanges(lista);
+            }
+        }
+        private void SaveChanges(List<Arranjo> lista)
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(lista, options);
+            File.WriteAllText(_filePath, json);
+        }
+
         public List<Arranjo> GetAllArranjos()
         {
             try

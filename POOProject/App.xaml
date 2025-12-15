@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:POOProject"
              StartupUri="Views/LoginWindow.xaml">
+    
     <Application.Resources>
-
     </Application.Resources>
 </Application>
 

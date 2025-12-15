@@ -41,7 +41,6 @@ namespace POOProject.Views.Factories
                 ViewType.Main => _serviceProvider.GetRequiredService<MainWindow>(),
                 ViewType.Registry => _serviceProvider.GetRequiredService<RegistryWindow>(),
                 ViewType.AddArranjo => _serviceProvider.GetRequiredService<AddArranjoWindow>(),
-                // ViewType.EditEmployee => _serviceProvider.GetRequiredService<EditEmployeeWindow>(),
                 _ => throw new NotImplementedException()
             };
 
@@ -51,13 +50,26 @@ namespace POOProject.Views.Factories
                 ViewType.Main => _serviceProvider.GetRequiredService<MainViewModel>(),
                 ViewType.Registry => _serviceProvider.GetRequiredService<RegistryViewModel>(),
                 ViewType.AddArranjo => _serviceProvider.GetRequiredService<AddArranjoViewModel>(),
-                // ViewType.EditEmployee => ActivatorUtilities.CreateInstance<EditEmployeeViewModel>(_serviceProvider, parameter!),
-
                 _ => throw new NotImplementedException()
             };
 
             window.DataContext = viewModel;
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+            //Fechar janelas
+            if (viewModel is LoginViewModel loginVm)
+            {
+                
+                loginVm.HideWindowAction = window.Close;
+            }
+            else if (viewModel is RegistryViewModel registryVm)
+            {
+                registryVm.HideWindowAction = window.Close;
+            }
+            else if (viewModel is AddArranjoViewModel addArranjoVm)
+            {
+                addArranjoVm.HideWindowAction = window.Close;
+            }
 
             return window;
         }

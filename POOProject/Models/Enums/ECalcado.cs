@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace POOProject.Models.Emuns
+namespace POOProject.Models.Enums
 {
 
     public enum TipoCalcado
