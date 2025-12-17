@@ -129,21 +129,36 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="{Binding TituloTabela}" 
-                               FontSize="18" FontWeight="SemiBold" Foreground="#333" 
-                               VerticalAlignment="Center"/>
+               FontSize="18" FontWeight="SemiBold" Foreground="#333" 
+               VerticalAlignment="Center"/>
 
-                    <Button Grid.Column="1"
-                            Content="➕ Novo Funcionário"
-                            Command="{Binding OpenAddFuncionarioCommand}"
-                            Visibility="{Binding IsFuncionariosVisible, Converter={StaticResource BoolToVis}}"
-                            Background="#009688" Foreground="White" FontWeight="Bold"
-                            Padding="15,5" BorderThickness="0" Cursor="Hand">
-                        <Button.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="5"/>
-                            </Style>
-                        </Button.Resources>
-                    </Button>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+
+                        <Border CornerRadius="5" Background="White" Margin="0,0,10,0" Padding="5,0"
+                Visibility="{Binding IsArranjosVisible, Converter={StaticResource BoolToVis}}"
+                BorderThickness="1" BorderBrush="#DDD" Height="35">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="🔍" VerticalAlignment="Center" Margin="5,0,5,0" Foreground="#888"/>
+                                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                         Width="200" VerticalContentAlignment="Center" BorderThickness="0" 
+                         Background="Transparent"
+                         ToolTip="Pesquisar por Cliente ou Nº Talão..."/>
+                            </StackPanel>
+                        </Border>
+
+                        <Button Content="➕ Novo Funcionário"
+                Command="{Binding OpenAddFuncionarioCommand}"
+                Visibility="{Binding IsFuncionariosVisible, Converter={StaticResource BoolToVis}}"
+                Background="#009688" Foreground="White" FontWeight="Bold"
+                Padding="15,5" BorderThickness="0" Cursor="Hand">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="5"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+
+                    </StackPanel>
                 </Grid>
 
                 <DataGrid Grid.Row="1" ItemsSource="{Binding Funcionarios}" 
@@ -157,10 +172,10 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Arranjos}" 
+                <DataGrid ItemsSource="{Binding Arranjos}" 
                           Visibility="{Binding IsArranjosVisible, Converter={StaticResource BoolToVis}}"
                           AutoGenerateColumns="False" CanUserAddRows="False" 
-                          BorderThickness="0" Background="White" HeadersVisibility="Column">
+                          BorderThickness="0" Background="White" HeadersVisibility="Column" Grid.Row="1">
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Nº Talão" Binding="{Binding Id}" Width="80"/>
