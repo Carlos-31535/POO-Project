@@ -29,8 +29,10 @@ namespace POOProject.Views.Enums
         EditEmployee,
 
 
-        AddArranjo
-        // TODO: Add more view types here as needed.
+        AddArranjo,
+
+        CreateFuncionario
+        
 
         #endregion
     }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq; // Necessário para filtrar (Where)
+using System.Linq; 
 using System.Windows;
 using System.Windows.Input;
 using POOProject.Models.Entities;
-using POOProject.Models.Enums; // Confirma o nome da pasta (Enums ou Emuns)
+using POOProject.Models.Enums;
 using POOProject.Models.Repositories.Interfaces;
 using POOProject.ViewModels.Commands;
 using POOProject.Views.Enums;
@@ -15,7 +15,8 @@ namespace POOProject.ViewModels
     public class MainViewModel : BaseViewModel
     {
         private readonly IViewFactory _viewFactory;
-        private readonly IArranjoRepository _arranjoRepository; // <--- NOVO REPOSITÓRIO
+        private readonly IArranjoRepository _arranjoRepository;
+        private readonly IFuncionarioRepository _funcionarioRepository; 
 
         // --- CONTROLO DE VISIBILIDADE ---
         private bool _isFuncionariosVisible = true;
@@ -42,21 +43,27 @@ namespace POOProject.ViewModels
 
         // --- LISTAS E COMANDOS ---
         public ObservableCollection<Funcionario> Funcionarios { get; set; }
-        public ObservableCollection<Arranjo> Arranjos { get; set; } // <--- NOVA LISTA
+        public ObservableCollection<Arranjo> Arranjos { get; set; }
 
         public ICommand OpenArranjoCommand { get; }
         public ICommand EditCommand { get; }
         public ICommand ShowPendingArranjoCommand { get; }
         public ICommand ShowFinishedArranjoCommand { get; }
-        
+
         public ICommand ShowFuncionariosCommand { get; }
         public ICommand MarkAsReadyCommand { get; }
         public ICommand ShowDetailsArranjoCommand { get; }
+        public ICommand OpenAddFuncionarioCommand { get; }
 
-        public MainViewModel(IViewFactory viewFactory, IArranjoRepository arranjoRepository)
+        // --- CONSTRUTOR ---
+        // Adicionei o IFuncionarioRepository aqui
+        public MainViewModel(IViewFactory viewFactory,
+                             IArranjoRepository arranjoRepository,
+                             IFuncionarioRepository funcionarioRepository)
         {
             _viewFactory = viewFactory ?? throw new ArgumentNullException(nameof(viewFactory));
             _arranjoRepository = arranjoRepository ?? throw new ArgumentNullException(nameof(arranjoRepository));
+            _funcionarioRepository = funcionarioRepository ?? throw new ArgumentNullException(nameof(funcionarioRepository));
 
             // Inicializar Listas
             Funcionarios = new ObservableCollection<Funcionario>();
@@ -70,9 +77,24 @@ namespace POOProject.ViewModels
             ShowFuncionariosCommand = new ViewModelCommand(ExecuteShowFuncionarios);
             MarkAsReadyCommand = new RelayCommand<Arranjo>(ExecuteMarkAsReady);
             ShowDetailsArranjoCommand = new RelayCommand<Arranjo>(ExecuteShowDetailsArranjos);
+            OpenAddFuncionarioCommand = new ViewModelCommand(ExecuteOpenAddFuncionario);
 
-            // Carregar dados iniciais (Funcionários)
-            CarregarFuncionariosTeste();
+            // Carregar dados REAIS ao iniciar 
+            CarregarFuncionarios();
+        }
+
+        // --- MÉTODOS DE DADOS ---
+
+        private void CarregarFuncionarios()
+        {
+            Funcionarios.Clear();
+            // Vai buscar a lista ao ficheiro JSON através do repositório
+            var listaDoDisco = _funcionarioRepository.GetAll();
+
+            foreach (var f in listaDoDisco)
+            {
+                Funcionarios.Add(f);
+            }
         }
 
         // --- LÓGICA DE TROCA DE ECRA ---
@@ -82,9 +104,7 @@ namespace POOProject.ViewModels
             IsArranjosVisible = true;
             TituloTabela = "Arranjos Pendentes (Por Arranjar)";
 
-            // CORREÇÃO AQUI: Usa o nome exato da tua interface
             var todos = _arranjoRepository.GetAllArranjos();
-
             var pendentes = todos.Where(a => a.Estado != EstadoArranjo.Pronto && a.Estado != EstadoArranjo.Entregue).ToList();
 
             Arranjos.Clear();
@@ -97,9 +117,7 @@ namespace POOProject.ViewModels
             IsArranjosVisible = true;
             TituloTabela = "Arranjos Prontos";
 
-            // CORREÇÃO AQUI TAMBÉM:
             var todos = _arranjoRepository.GetAllArranjos();
-
             var prontos = todos.Where(a => a.Estado == EstadoArranjo.Pronto).ToList();
 
             Arranjos.Clear();
@@ -111,6 +129,9 @@ namespace POOProject.ViewModels
             IsFuncionariosVisible = true;
             IsArranjosVisible = false;
             TituloTabela = "Lista de Funcionários";
+
+            // Garante que a lista está atualizada sempre que voltas a este ecrã
+            CarregarFuncionarios();
         }
 
         // --- OUTROS MÉTODOS ---
@@ -118,7 +139,7 @@ namespace POOProject.ViewModels
         {
             Window window = _viewFactory.ShowDialog(ViewType.AddArranjo);
             window.ShowDialog();
-            // Opcional: Atualizar a lista depois de fechar a janela
+
             if (IsArranjosVisible) ExecuteShowPendingArranjos(null);
         }
 
@@ -127,35 +148,22 @@ namespace POOProject.ViewModels
             MessageBox.Show($"A editar: {funcionario.FirstName}");
         }
 
-        //teste basico, eliminar dps
-        private void CarregarFuncionariosTeste()
-        {
-            Funcionarios.Add(new Funcionario("João", "Silva", 1));
-            Funcionarios.Add(new Funcionario("Maria", "Santos", 2));
-        }
-
-
         private void ExecuteMarkAsReady(Arranjo arranjo)
         {
             if (arranjo != null)
             {
-                // 1. MUDAR A ETIQUETA
-                // Ao fazeres isto, ele já "pertence" à outra página na memória.
                 arranjo.Estado = EstadoArranjo.Pronto;
-
-                // 2. AVISAR
                 _arranjoRepository.Update(arranjo);
+
                 MessageBox.Show($"Talão {arranjo.Id} marcado como PRONTO! Vai mover-se para a lista de Prontos.", "Sucesso");
 
-                // 3. FAZER ELE "IR" PARA A OUTRA PÁGINA
-                // Para ele ir, tem de sair desta. 
-                // Isto NÃO APAGA O DADO, só o tira desta lista visual "Por Arranjar".
                 if (Arranjos.Contains(arranjo))
                 {
                     Arranjos.Remove(arranjo);
                 }
             }
         }
+
         private void ExecuteShowDetailsArranjos(Arranjo arranjo)
         {
             if (arranjo == null) return;
@@ -174,6 +182,18 @@ namespace POOProject.ViewModels
             }
 
             MessageBox.Show(detalhes, $"Detalhes do Talão #{arranjo.Id}");
+        }
+
+        private void ExecuteOpenAddFuncionario(object? obj)
+        {
+            // 1. Abre a janela de criar funcionário
+            Window window = _viewFactory.ShowDialog(ViewType.CreateFuncionario);
+
+            // 2. Fica à espera que feches a janela
+            window.ShowDialog();
+
+            // 3. ASSIM QUE FECHAR, ATUALIZA A LISTA COM OS DADOS NOVOS
+            CarregarFuncionarios();
         }
     }
 }

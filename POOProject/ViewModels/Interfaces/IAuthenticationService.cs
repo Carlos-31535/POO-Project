@@ -24,6 +24,8 @@
         /// <returns></returns>
         bool CreateUser(string username, string password, string passwordRepeat);
 
+        POOProject.Models.Entities.Funcionario? CurrentFuncionario { get; }
+
         #endregion
     }
 }

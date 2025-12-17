@@ -16,5 +16,6 @@ namespace POOProject.Models.Entities
             LastName = lastname;
 
         }
+        public string NomeCompleto => $"{FirstName} {LastName}";
     }
 }

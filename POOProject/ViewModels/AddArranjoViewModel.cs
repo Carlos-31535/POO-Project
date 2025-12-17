@@ -16,18 +16,27 @@ namespace POOProject.ViewModels
     public class AddArranjoViewModel : BaseViewModel
     {
         private readonly IArranjoRepository _repository;
+        private readonly IFuncionarioRepository _funcionarioRepository; // <--- 1. NOVO: Repositório adicionado
 
         // Dados do Formulário
         private string _nomeCliente = string.Empty;
         private string _sobrenomeCliente = string.Empty;
         private int _numeroPares = 1;
 
-        // Lista que aparece no ecrã
+        // --- LISTAS E SELEÇÕES ---
         public ObservableCollection<RepairItemViewModel> RepairItems { get; set; }
 
-        public ICommand SaveCommand { get; }
+        // 2. NOVA LISTA para a ComboBox
+        public ObservableCollection<Funcionario> ListaFuncionarios { get; set; }
 
-        // Ação para fechar a janela (o ViewFactory preenche isto)
+        private Funcionario? _funcionarioSelecionado;
+        public Funcionario? FuncionarioSelecionado
+        {
+            get => _funcionarioSelecionado;
+            set { _funcionarioSelecionado = value; OnPropertyChanged(nameof(FuncionarioSelecionado)); }
+        }
+
+        public ICommand SaveCommand { get; }
         public Action? HideWindowAction { get; set; }
 
         public string NomeCliente
@@ -49,35 +58,56 @@ namespace POOProject.ViewModels
             {
                 _numeroPares = value;
                 OnPropertyChanged(nameof(NumeroPares));
-                UpdateList(); // Recria a lista quando mudas o número
+                UpdateList();
             }
         }
 
-        // Construtor
-        public AddArranjoViewModel(IArranjoRepository repository)
+        // --- CONSTRUTOR ---
+        // 3. Injetamos aqui o IFuncionarioRepository
+        public AddArranjoViewModel(IArranjoRepository repository, IFuncionarioRepository funcionarioRepository)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _funcionarioRepository = funcionarioRepository ?? throw new ArgumentNullException(nameof(funcionarioRepository));
 
             RepairItems = new ObservableCollection<RepairItemViewModel>();
+            ListaFuncionarios = new ObservableCollection<Funcionario>(); // Inicializa a lista
+
             SaveCommand = new ViewModelCommand(ExecuteSave);
 
-            // Inicializa a lista com 1 par
+            // Inicializa a lista de sapatos
             UpdateList();
+
+            // 4. Carrega os funcionários para a ComboBox
+            CarregarFuncionarios();
         }
 
-        // Gera as "Fichas" para cada par de sapatos
+        private void CarregarFuncionarios()
+        {
+            ListaFuncionarios.Clear();
+
+            // Vai buscar todos ao ficheiro JSON
+            var todos = _funcionarioRepository.GetAll();
+
+            foreach (var f in todos)
+            {
+                ListaFuncionarios.Add(f);
+            }
+
+            // Seleciona o primeiro automaticamente (opcional, para não vir vazio)
+            if (ListaFuncionarios.Count > 0)
+            {
+                FuncionarioSelecionado = ListaFuncionarios[0];
+            }
+        }
+
         private void UpdateList()
         {
             RepairItems.Clear();
-
-            // Pega em todos os serviços do Enum "Servicos"
             var todosServicos = Enum.GetValues(typeof(Servicos)).Cast<Servicos>().ToList();
 
             for (int i = 1; i <= NumeroPares; i++)
             {
                 var itemVM = new RepairItemViewModel { Title = $"Par {i}" };
-
-                // Para cada par, cria as checkboxes de serviços
                 foreach (var servicoEnum in todosServicos)
                 {
                     itemVM.AvailableServices.Add(new ServiceOptionViewModel
@@ -91,7 +121,6 @@ namespace POOProject.ViewModels
             }
         }
 
-        // Botão Guardar
         private void ExecuteSave(object? obj)
         {
             if (string.IsNullOrWhiteSpace(NomeCliente))
@@ -100,44 +129,43 @@ namespace POOProject.ViewModels
                 return;
             }
 
-            // 1. Criar o Objeto ARRANJO (Entidade do Prof)
+            // 5. Validação: Obrigatório escolher funcionário
+            if (FuncionarioSelecionado == null)
+            {
+                MessageBox.Show("Selecione o Funcionário Responsável.");
+                return;
+            }
+
             var novoArranjo = new Arranjo
             {
                 Cliente = new Cliente(NomeCliente, SobrenomeCliente),
-                FuncionarioResponsavel = new Funcionario("Admin", "User", 1), // Trocar para marcar o user que esta a logado
+
+                // 6. Usa o funcionário selecionado na ComboBox em vez do "Admin" falso
+                FuncionarioResponsavel = FuncionarioSelecionado,
+
                 Estado = EstadoArranjo.Arranjar,
                 DataEntrada = DateTime.Now
             };
 
-            // 2. Converter os dados do ecrã para a Lista de Calçado
             foreach (var vm in RepairItems)
             {
                 var calcado = new Calcado
                 {
                     NumPar = vm.Title,
-                    Tipo = vm.SelectedTipo, // Vem da ComboBox
-                    Cor = vm.SelectedCor,   // Vem da ComboBox
+                    Tipo = vm.SelectedTipo,
+                    Cor = vm.SelectedCor,
                     Descricao = vm.Description
                 };
 
-                // Verificar quais serviços foram marcados
                 foreach (var opcao in vm.AvailableServices)
                 {
-                    if (opcao.IsSelected)
-                    {
-                        calcado.ServicosParaFazer.Add(opcao.EnumValue);
-                    }
+                    if (opcao.IsSelected) calcado.ServicosParaFazer.Add(opcao.EnumValue);
                 }
-
                 novoArranjo.ListaCalcado.Add(calcado);
             }
 
-            // 3. Guardar no Repositório
             _repository.SaveArranjo(novoArranjo);
-
             MessageBox.Show($"Talão {novoArranjo.Id} criado com sucesso!");
-
-            // Fecha a janela
             HideWindowAction?.Invoke();
         }
     }

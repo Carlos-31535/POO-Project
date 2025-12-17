@@ -37,6 +37,16 @@
                         <ComboBoxItem Content="5"/>
                     </ComboBox>
                 </StackPanel>
+                
+                <StackPanel Margin="0,15,0,0">
+                    <Label Content="Funcionário Responsável:" FontWeight="Bold"/>
+
+                    <ComboBox ItemsSource="{Binding ListaFuncionarios}" 
+              SelectedItem="{Binding FuncionarioSelecionado}"
+              DisplayMemberPath="NomeCompleto"
+              Height="30" Width="250" HorizontalAlignment="Left"
+              Background="White"/>
+                </StackPanel>
             </StackPanel>
         </Border>
 

@@ -10,10 +10,13 @@ namespace POOProject.Models.Entities
     {
         public int Id { get; set; }
 
+        public string Username { get; set; }
+
         public Funcionario(string firstName, string lastName, int id)
         : base(firstName, lastName)
         {
             Id = id;
+            Username = string.Empty; // Inicializa vazio
         }
     }
 }

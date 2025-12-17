@@ -8,48 +8,41 @@ using POOProject.Views;
 using POOProject.Views.Enums;
 using POOProject.Views.Factories;
 using POOProject.Views.Interfaces;
-using System.Configuration;
-using System.Data;
+using System;
 using System.Windows;
 
 namespace POOProject
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         public static IServiceProvider ServiceProvider { get; private set; }
 
         private static void LoadServiceProvider()
         {
-            ServiceProvider = new ServiceCollection()
-                
-                .AddSingleton<LoginViewModel>()
-                .AddSingleton<RegistryViewModel>()
-                .AddSingleton<IViewFactory, ViewFactory>()
-                .AddSingleton<IUserRepository, UserRepository>()
-                .AddSingleton<IAuthenticationService, AuthenticationService>()
+            var services = new ServiceCollection();
 
-                
+            // Repositórios e Serviços (Mantém estes, são importantes!)
+            services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddSingleton<IFuncionarioRepository, FuncionarioRepository>();
+            services.AddSingleton<IArranjoRepository, ArranjoRepository>();
+            services.AddSingleton<IAuthenticationService, AuthenticationService>();
+            services.AddSingleton<IViewFactory, ViewFactory>();
 
-        
-                .AddSingleton<IArranjoRepository, ArranjoRepository>()
-                // .AddSingleton<IEmployeeRepository, EmployeeRepository>() // <-- Descomenta se tiveres criado o ficheiro EmployeeRepository.cs
+            // ViewModels
+            services.AddSingleton<LoginViewModel>();
+            services.AddSingleton<RegistryViewModel>();
+            services.AddTransient<MainViewModel>();
+            services.AddTransient<AddArranjoViewModel>();
+            services.AddTransient<CreateFuncionarioViewModel>();
 
-                // 2. ViewModels Novos (Main e Arranjo)
-                .AddTransient<MainViewModel>()
-                .AddTransient<AddArranjoViewModel>()
+            // Janelas
+            services.AddTransient<LoginWindow>();
+            services.AddTransient<RegistryWindow>();
+            services.AddTransient<MainWindow>();
+            services.AddTransient<AddArranjoWindow>();
+            services.AddTransient<CreateFuncionarioWindow>();
 
-                // 3. Views / Janelas (Necessário para o Factory as conseguir criar)
-                .AddTransient<LoginWindow>()
-                .AddTransient<RegistryWindow>()
-                .AddTransient<MainWindow>()
-                .AddTransient<AddArranjoWindow>()
-                
-
-                // Finaliza
-                .BuildServiceProvider();
+            ServiceProvider = services.BuildServiceProvider();
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -57,11 +50,10 @@ namespace POOProject
             base.OnStartup(e);
             LoadServiceProvider();
 
+            // Usar a fábrica para abrir a primeira janela
             var viewFactory = ServiceProvider.GetRequiredService<IViewFactory>();
-
             var loginWindow = viewFactory.ShowDialog(ViewType.Login);
             loginWindow.Show();
         }
     }
-
 }

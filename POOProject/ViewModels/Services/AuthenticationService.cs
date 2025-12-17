@@ -12,6 +12,9 @@ namespace POOProject.ViewModels.Services
         #region Fields
 
         private readonly IUserRepository _userRepository;
+        private readonly IFuncionarioRepository _funcionarioRepository;
+
+        public Funcionario? CurrentFuncionario { get; private set; }
 
         #endregion
 
@@ -22,9 +25,10 @@ namespace POOProject.ViewModels.Services
         /// </summary>
         /// <param name="userRepository">Repository used to fetch user data.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="userRepository"/> is null.</exception>
-        public AuthenticationService(IUserRepository userRepository)
+        public AuthenticationService(IUserRepository userRepository, IFuncionarioRepository funcionarioRepository)
         {
-            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _userRepository = userRepository;
+            _funcionarioRepository = funcionarioRepository;
         }
 
         #endregion
@@ -39,23 +43,23 @@ namespace POOProject.ViewModels.Services
         /// <returns>True if a user exists and the password matches; otherwise, false.</returns>
         public bool UserExists(string username, string password)
         {
-            // Return false if username or password is null or empty
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) return false;
+
+            var user = _userRepository.GetUserByUsername(username);
+
+            if (user != null && user.Password == password)
             {
-                return false;
+                // --- FALTA ESTA LÓGICA DE CARREGAR O PERFIL ---
+                var perfil = _funcionarioRepository.GetByUsername(username);
+
+                if (perfil != null)
+                    CurrentFuncionario = perfil;
+                else
+                    CurrentFuncionario = new Funcionario("", "", 0) { Username = username };
+
+                return true;
             }
-
-            // Retrieve user from repository
-            User user = _userRepository.GetUserByUsername(username);
-
-            // Return false if user is not found
-            if (user == null)
-            {
-                return false;
-            }
-
-            // Validate password
-            return user.Password == password;
+            return false;
         }
 
         public bool CreateUser(string username, string password, string passwordRepeat)

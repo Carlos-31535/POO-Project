@@ -1,0 +1,24 @@
+﻿<Window x:Class="POOProject.Views.CreateFuncionarioWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Novo Funcionário" Height="350" Width="400"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Background="#F2F3F5">
+
+    <Grid Margin="30">
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Adicionar Funcionário" FontSize="20" FontWeight="Bold" 
+                       Foreground="#2C2F48" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+            <TextBlock Text="Nome:" FontWeight="SemiBold" Foreground="#444"/>
+            <TextBox Text="{Binding FirstName}" Height="35" Padding="5" Margin="0,0,0,15"/>
+
+            <TextBlock Text="Apelido:" FontWeight="SemiBold" Foreground="#444"/>
+            <TextBox Text="{Binding LastName}" Height="35" Padding="5" Margin="0,0,0,20"/>
+
+            <Button Command="{Binding SaveCommand}" Content="GUARDAR" 
+                    Height="40" Background="#009688" Foreground="White" 
+                    FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+        </StackPanel>
+    </Grid>
+</Window>
