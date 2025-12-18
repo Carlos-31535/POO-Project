@@ -2,67 +2,82 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace POOProject.Models.Entities
 {
     public class Arranjo
     {
-        public string Id { get; set; } // O ID gerado automaticamente (Ex: "A0001")
+        // --- PROPRIEDADES (Tudo Public { get; set; } para o JSON funcionar bem) ---
+
+        public string Id { get; set; } = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+
         public Cliente Cliente { get; set; }
-        public Funcionario FuncionarioResponsavel { get; set; } // Quem atendeu o cliente
+        public Funcionario FuncionarioResponsavel { get; set; }
+
         public DateTime DataEntrada { get; set; }
-        public EstadoArranjo Estado { get; set; } // O estado do arranjo 
+        public DateTime? DataConclusao { get; set; }
+        public EstadoArranjo Estado { get; set; }
 
-        public List<Calcado> ListaCalcado { get; set; } // A lista de calçado deste talão(caso tenha mais que 1 par)
+        // [CORREÇÃO] Transformámos a lista numa Propriedade com { get; set; }
+        // Assim o JSON grava e lê os sapatos automaticamente.
+        public List<Calcado> ListaCalcado { get; set; } = new List<Calcado>();
 
+        // --- CONSTRUTORES ---
+
+        // Construtor Principal
+        public Arranjo(Cliente cliente, Funcionario funcionario)
+        {
+            Cliente = cliente ?? throw new ArgumentNullException(nameof(cliente));
+            FuncionarioResponsavel = funcionario ?? throw new ArgumentNullException(nameof(funcionario));
+
+            ListaCalcado = new List<Calcado>();
+            DataEntrada = DateTime.Now;
+            Estado = EstadoArranjo.Arranjar;
+        }
+
+        // Construtor Vazio (JSON)
         public Arranjo()
         {
             ListaCalcado = new List<Calcado>();
-            Estado = EstadoArranjo.Arranjar; // Começa sempre como "Arranjar"
-            DataEntrada = DateTime.Now;
+            Cliente = null!;
+            FuncionarioResponsavel = null!;
         }
 
-        /// <summary>
-        /// Adiciona um par de sapatos, mas valida antes se o Cliente e Funcionário estão preenchidos.
-        /// </summary>
+        // --- MÉTODOS DE NEGÓCIO ---
+
         public void AdicionarCalcado(Calcado calcado)
         {
-            // 1. Validar se o Sapato existe
-            if (calcado == null)
-            {
-                throw new ArgumentNullException("Não podes adicionar um registo de calçado vazio.");
-            }
+            // Validação de segurança
+            if (calcado == null) throw new ArgumentNullException("Sapato inválido.");
+            if (calcado.ServicosParaFazer.Count == 0)
+                throw new InvalidOperationException("O sapato tem de ter pelo menos 1 serviço.");
 
-            // 2. Validar se o Cliente existe e tem nomes
-            if (this.Cliente == null)
-            {
-                throw new InvalidOperationException("Erro: Tens de selecionar um Cliente antes de adicionar sapatos.");
-            }
-
-            if (string.IsNullOrWhiteSpace(this.Cliente.FirstName) || string.IsNullOrWhiteSpace(this.Cliente.LastName))
-            {
-                throw new InvalidOperationException("O Cliente selecionado tem de ter Nome e Apelido válidos.");
-            }
-
-            // 3. Validar se o Funcionário Responsável existe
-            if (this.FuncionarioResponsavel == null)
-            {
-                throw new InvalidOperationException("Erro: O talão tem de ter um Funcionário responsável associado.");
-            }
-
-            // --- Se passou por tudo isto, adiciona à lista ---
-            this.ListaCalcado.Add(calcado);
+            ListaCalcado.Add(calcado);
         }
 
-        /// <summary>
-        /// Calcula quantos pares existem neste talão.
-        /// Útil para mostrar na grelha ou no recibo.
-        /// </summary>
-        public int ObterQuantidadePares()
+        public void MarcarComoPronto()
         {
-            return ListaCalcado.Count;
+            if (ListaCalcado.Count == 0)
+                throw new InvalidOperationException("Não podes fechar um talão sem sapatos.");
+
+            Estado = EstadoArranjo.Pronto;
+            DataConclusao = DateTime.Now;
         }
+
+        public void EntregarAoCliente()
+        {
+            if (Estado != EstadoArranjo.Pronto)
+                throw new InvalidOperationException("O arranjo ainda não está pronto.");
+
+            Estado = EstadoArranjo.Entregue;
+        }
+
+        // --- HELPERS VISUAIS (Para a DataGrid do Main Window) ---
+
+        // Quantidade de pares (seguro contra nulls)
+        public int QuantidadePares => ListaCalcado?.Count ?? 0;
+
+        // Nome do cliente formatado
+        public string NomeClienteDisplay => Cliente?.NomeCompleto ?? "N/A";
     }
 }

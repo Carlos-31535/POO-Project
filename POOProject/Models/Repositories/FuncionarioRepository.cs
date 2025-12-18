@@ -25,7 +25,6 @@ namespace POOProject.Models.Repositories
         public Funcionario GetByUsername(string username)
         {
             var lista = GetAll();
-            // Agora já funciona porque adicionámos o campo Username à classe Funcionario
             return lista.FirstOrDefault(f => f.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -34,12 +33,11 @@ namespace POOProject.Models.Repositories
             var lista = GetAll();
 
             var existente = lista.FirstOrDefault(f => f.Username == funcionario.Username);
+
             if (existente != null)
             {
-                // Atualiza os dados mantendo o ID antigo
-                existente.FirstName = funcionario.FirstName;
-                existente.LastName = funcionario.LastName;
-                // O Username e ID não mudam
+                // [CORREÇÃO AQUI] Usa o método público para atualizar
+                existente.AtualizarDados(funcionario.FirstName, funcionario.LastName);
             }
             else
             {

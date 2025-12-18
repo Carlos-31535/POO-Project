@@ -15,6 +15,10 @@ namespace POOProject.ViewModels
         private readonly IArranjoRepository _repository;
         private readonly IFuncionarioRepository _funcionarioRepository;
 
+        // --- NOVO: Ação para mostrar mensagens (Testável!) ---
+        // Por defeito, usa a MessageBox real. Nos testes, vamos mudar isto.
+        public Action<string> ShowMessageAction { get; set; } = (msg) => MessageBox.Show(msg);
+
         // Dados do Formulário
         private string _nomeCliente = string.Empty;
         private string _sobrenomeCliente = string.Empty;
@@ -57,7 +61,6 @@ namespace POOProject.ViewModels
             }
         }
 
-        // --- CONSTRUTOR ---
         public AddArranjoViewModel(IArranjoRepository repository, IFuncionarioRepository funcionarioRepository)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -104,42 +107,59 @@ namespace POOProject.ViewModels
 
         private void ExecuteSave(object? obj)
         {
-            // 1. Validações
-            if (string.IsNullOrWhiteSpace(NomeCliente)) { MessageBox.Show("Preencha o nome do cliente."); return; }
-            if (FuncionarioSelecionado == null) { MessageBox.Show("Selecione o Funcionário Responsável."); return; }
-
-            // 2. Criar Objeto Arranjo
-            var novoArranjo = new Arranjo
+            if (string.IsNullOrWhiteSpace(NomeCliente))
             {
-                Cliente = new Cliente(NomeCliente, SobrenomeCliente),
-                FuncionarioResponsavel = FuncionarioSelecionado,
-                Estado = EstadoArranjo.Arranjar,
-                DataEntrada = DateTime.Now
-            };
-
-            // 3. Adicionar Sapatos
-            foreach (var vm in RepairItems)
+                ShowMessageAction("Preencha o nome do cliente."); // USAR NOVA AÇÃO
+                return;
+            }
+            if (FuncionarioSelecionado == null)
             {
-                var calcado = new Calcado
-                {
-                    NumPar = vm.Title,
-                    Tipo = vm.SelectedTipo,
-                    Cor = vm.SelectedCor,
-                    Descricao = vm.Description
-                };
-                foreach (var opcao in vm.AvailableServices)
-                {
-                    if (opcao.IsSelected) calcado.ServicosParaFazer.Add(opcao.EnumValue);
-                }
-                novoArranjo.ListaCalcado.Add(calcado);
+                ShowMessageAction("Selecione o Funcionário Responsável."); // USAR NOVA AÇÃO
+                return;
             }
 
-            // 4. Guardar na BD
-            _repository.SaveArranjo(novoArranjo);
+            foreach (var item in RepairItems)
+            {
+                bool temServico = item.AvailableServices.Any(s => s.IsSelected);
+                if (!temServico)
+                {
+                    // USAR NOVA AÇÃO
+                    ShowMessageAction($"O '{item.Title}' não tem nenhum serviço selecionado.\nSelecione pelo menos um serviço.");
+                    return;
+                }
+            }
 
-            // 5. Mensagem Simples e Fechar Janela (VOLTOU AO ORIGINAL)
-            MessageBox.Show($"Talão {novoArranjo.Id} criado com sucesso!", "Sucesso");
-            HideWindowAction?.Invoke();
+            try
+            {
+                var cliente = new Cliente(NomeCliente, SobrenomeCliente);
+                var novoArranjo = new Arranjo(cliente, FuncionarioSelecionado);
+
+                foreach (var vm in RepairItems)
+                {
+                    var calcado = new Calcado
+                    {
+                        NumPar = vm.Title,
+                        Tipo = vm.SelectedTipo,
+                        Cor = vm.SelectedCor,
+                        Descricao = vm.Description
+                    };
+
+                    foreach (var opcao in vm.AvailableServices)
+                    {
+                        if (opcao.IsSelected) calcado.ServicosParaFazer.Add(opcao.EnumValue);
+                    }
+                    novoArranjo.AdicionarCalcado(calcado);
+                }
+
+                _repository.SaveArranjo(novoArranjo);
+
+                ShowMessageAction($"Talão {novoArranjo.Id} criado com sucesso!"); // USAR NOVA AÇÃO
+                HideWindowAction?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                ShowMessageAction($"Erro: {ex.Message}"); // USAR NOVA AÇÃO
+            }
         }
     }
 }

@@ -2,11 +2,10 @@
 using POOProject.Models.Enums;
 using POOProject.Models.Repositories.Interfaces;
 using POOProject.ViewModels.Commands;
-using POOProject.Views;
 using POOProject.Views.Enums;
 using POOProject.Views.Interfaces;
 using System;
-using System.Collections.Generic; // Necessário para List<>
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -20,14 +19,17 @@ namespace POOProject.ViewModels
         private readonly IArranjoRepository _arranjoRepository;
         private readonly IFuncionarioRepository _funcionarioRepository;
 
+        // --- NOVO: Ação para mensagens (Testável!) ---
+        public Action<string> MessageBoxAction { get; set; } = (msg) => MessageBox.Show(msg);
+
         // --- CONTROLO DE VISIBILIDADE ---
         private bool _isFuncionariosVisible = true;
         private bool _isArranjosVisible = false;
         private string _tituloTabela = "Lista de Funcionários";
 
-        // --- PESQUISA (NOVO) ---
+        // --- PESQUISA ---
         private string _searchText = string.Empty;
-        // Esta lista serve de "Backup" da lista original carregada da base de dados
+        // Cache para guardar a lista completa enquanto filtramos a visual
         private List<Arranjo> _listaCompletaCache = new List<Arranjo>();
 
         public string SearchText
@@ -37,8 +39,7 @@ namespace POOProject.ViewModels
             {
                 _searchText = value;
                 OnPropertyChanged(nameof(SearchText));
-                // Sempre que escreves uma letra, ele filtra automaticamente
-                FiltrarLista();
+                FiltrarLista(); // Filtra ao escrever
             }
         }
 
@@ -84,6 +85,7 @@ namespace POOProject.ViewModels
             Funcionarios = new ObservableCollection<Funcionario>();
             Arranjos = new ObservableCollection<Arranjo>();
 
+            // Inicialização dos Comandos
             OpenArranjoCommand = new ViewModelCommand(ExecuteOpenArranjo);
             ShowPendingArranjoCommand = new ViewModelCommand(ExecuteShowPendingArranjos);
             ShowFinishedArranjoCommand = new ViewModelCommand(ExecuteShowFinishedArranjos);
@@ -92,30 +94,28 @@ namespace POOProject.ViewModels
             ShowDetailsArranjoCommand = new RelayCommand<Arranjo>(ExecuteShowDetailsArranjos);
             OpenAddFuncionarioCommand = new ViewModelCommand(ExecuteOpenAddFuncionario);
 
+            // Carrega dados iniciais
             CarregarFuncionariosReais();
         }
 
-        // --- LÓGICA DE PESQUISA (NOVO) ---
+        // --- LÓGICA DE PESQUISA ---
         private void FiltrarLista()
         {
-            // Se não estamos a ver arranjos, não faz nada
             if (!IsArranjosVisible) return;
 
             Arranjos.Clear();
 
-            // Se a caixa de pesquisa estiver vazia, mostra tudo o que estava em cache
             if (string.IsNullOrWhiteSpace(SearchText))
             {
+                // Se não há pesquisa, repõe tudo o que estava em cache
                 foreach (var item in _listaCompletaCache) Arranjos.Add(item);
             }
             else
             {
-                // Pesquisa inteligente (Ignora maiúsculas/minúsculas)
                 string termo = SearchText.ToLower();
-
                 var filtrados = _listaCompletaCache.Where(a =>
-                    a.Cliente.NomeCompleto.ToLower().Contains(termo) || // Pesquisa por Nome
-                    a.Id.ToLower().Contains(termo)                      // Pesquisa por ID do Talão (opcional)
+                    a.Cliente.NomeCompleto.ToLower().Contains(termo) ||
+                    a.Id.ToLower().Contains(termo)
                 );
 
                 foreach (var item in filtrados) Arranjos.Add(item);
@@ -136,15 +136,13 @@ namespace POOProject.ViewModels
             IsFuncionariosVisible = false;
             IsArranjosVisible = true;
             TituloTabela = "Arranjos Pendentes";
-
-            // Limpa a pesquisa antiga quando mudas de aba
-            SearchText = "";
+            SearchText = ""; // Limpa pesquisa anterior
 
             var todos = _arranjoRepository.GetAllArranjos();
-            // Guarda na memória (Cache) apenas os pendentes
+            // Filtra apenas os que NÃO estão prontos nem entregues
             _listaCompletaCache = todos.Where(a => a.Estado != EstadoArranjo.Pronto && a.Estado != EstadoArranjo.Entregue).ToList();
 
-            FiltrarLista(); // Atualiza o ecrã
+            FiltrarLista();
         }
 
         private void ExecuteShowFinishedArranjos(object? obj)
@@ -152,14 +150,13 @@ namespace POOProject.ViewModels
             IsFuncionariosVisible = false;
             IsArranjosVisible = true;
             TituloTabela = "Arranjos Prontos";
-
             SearchText = "";
 
             var todos = _arranjoRepository.GetAllArranjos();
-            // Guarda na memória (Cache) apenas os prontos
+            // Filtra apenas os PRONTOS
             _listaCompletaCache = todos.Where(a => a.Estado == EstadoArranjo.Pronto).ToList();
 
-            FiltrarLista(); // Atualiza o ecrã
+            FiltrarLista();
         }
 
         private void ExecuteShowFuncionarios(object? obj)
@@ -170,10 +167,14 @@ namespace POOProject.ViewModels
             CarregarFuncionariosReais();
         }
 
+        // --- AÇÕES PRINCIPAIS ---
+
         private void ExecuteOpenArranjo(object? parameter)
         {
             Window window = _viewFactory.ShowDialog(ViewType.AddArranjo);
             window.ShowDialog();
+
+            // Se estivermos a ver a lista de arranjos, atualiza-a ao fechar a janela
             if (IsArranjosVisible) ExecuteShowPendingArranjos(null);
         }
 
@@ -186,16 +187,26 @@ namespace POOProject.ViewModels
 
         private void ExecuteMarkAsReady(Arranjo arranjo)
         {
-            if (arranjo != null)
+            if (arranjo == null) return;
+
+            try
             {
-                arranjo.Estado = EstadoArranjo.Pronto;
+                // Lógica de negócio segura
+                arranjo.MarcarComoPronto();
+
+                // Gravar na Base de Dados
                 _arranjoRepository.Update(arranjo);
 
-                MessageBox.Show($"Talão {arranjo.Id} marcado como PRONTO!", "Sucesso");
+                // Usar a Action em vez de MessageBox direto (para testes)
+                MessageBoxAction($"Talão {arranjo.Id} marcado como PRONTO!");
 
-                // Atualiza a lista visualmente
+                // Remove da lista atual para dar feedback imediato
                 if (Arranjos.Contains(arranjo)) Arranjos.Remove(arranjo);
                 if (_listaCompletaCache.Contains(arranjo)) _listaCompletaCache.Remove(arranjo);
+            }
+            catch (Exception ex)
+            {
+                MessageBoxAction($"Não foi possível concluir: {ex.Message}");
             }
         }
 
@@ -203,17 +214,15 @@ namespace POOProject.ViewModels
         {
             if (arranjo == null) return;
 
-            // 1. A Factory cria a Janela e o ViewModel (agora funciona porque o construtor é vazio)
+            // Usa a Factory para criar a janela de detalhes
             Window window = _viewFactory.ShowDialog(ViewType.DetalhesTalao);
 
-            // 2. Obtemos o ViewModel que a Factory injetou no DataContext
+            // Injeta os dados no ViewModel que foi criado pela Factory
             if (window.DataContext is DetalhesTalaoViewModel vm)
             {
-                // 3. Injetamos o talão selecionado manualmente
                 vm.CarregarDados(arranjo);
             }
 
-            // 4. Mostramos a janela
             window.ShowDialog();
         }
     }

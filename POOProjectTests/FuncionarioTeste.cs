@@ -7,6 +7,17 @@ namespace POOProjectTests
     public class FuncionarioTests
     {
         [TestMethod]
+        public void CriarFuncionario_DeveGerarUsernameAutomatico()
+        {
+            // 1. Act
+            var func = new Funcionario("Pedro", "Santos", 1);
+
+            // 2. Assert
+            // A regra é: nome.sobrenome (tudo minusculo)
+            Assert.AreEqual("pedro.santos", func.Username, "O username deve ser gerado automaticamente como 'nome.apelido'.");
+        }
+
+        [TestMethod]
         public void CriarFuncionario_DeveGuardarDadosCorretamente()
         {
             // 1. Arrange

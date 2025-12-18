@@ -9,14 +9,14 @@ namespace POOProject.Models.Entities
     public class Funcionario : Pessoa
     {
         public int Id { get; set; }
-
         public string Username { get; set; }
 
         public Funcionario(string firstName, string lastName, int id)
-        : base(firstName, lastName)
+            : base(firstName, lastName) // Chama o construtor da Pessoa (que valida os nomes)
         {
             Id = id;
-            Username = string.Empty; // Inicializa vazio
+            // Gera um username default se não for passado
+            Username = $"{firstName}.{lastName}".ToLower();
         }
     }
 }

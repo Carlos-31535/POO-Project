@@ -173,9 +173,13 @@
                 </DataGrid>
 
                 <DataGrid ItemsSource="{Binding Arranjos}" 
-                          Visibility="{Binding IsArranjosVisible, Converter={StaticResource BoolToVis}}"
-                          AutoGenerateColumns="False" CanUserAddRows="False" 
-                          BorderThickness="0" Background="White" HeadersVisibility="Column" Grid.Row="1">
+          Visibility="{Binding IsArranjosVisible, Converter={StaticResource BoolToVis}}"
+          AutoGenerateColumns="False" 
+          CanUserAddRows="False" 
+          IsReadOnly="True"  BorderThickness="0" 
+          Background="White" 
+          HeadersVisibility="Column" 
+          Grid.Row="1">
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Nº Talão" Binding="{Binding Id}" Width="80"/>
