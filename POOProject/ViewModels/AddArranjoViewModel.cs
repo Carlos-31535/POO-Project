@@ -1,13 +1,10 @@
 ﻿using POOProject.Models.Enums;
 using POOProject.Models.Entities;
 using POOProject.Models.Repositories.Interfaces;
-using POOProject.ViewModels;
+using POOProject.ViewModels.Commands;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -16,7 +13,7 @@ namespace POOProject.ViewModels
     public class AddArranjoViewModel : BaseViewModel
     {
         private readonly IArranjoRepository _repository;
-        private readonly IFuncionarioRepository _funcionarioRepository; // <--- 1. NOVO: Repositório adicionado
+        private readonly IFuncionarioRepository _funcionarioRepository;
 
         // Dados do Formulário
         private string _nomeCliente = string.Empty;
@@ -25,8 +22,6 @@ namespace POOProject.ViewModels
 
         // --- LISTAS E SELEÇÕES ---
         public ObservableCollection<RepairItemViewModel> RepairItems { get; set; }
-
-        // 2. NOVA LISTA para a ComboBox
         public ObservableCollection<Funcionario> ListaFuncionarios { get; set; }
 
         private Funcionario? _funcionarioSelecionado;
@@ -63,41 +58,27 @@ namespace POOProject.ViewModels
         }
 
         // --- CONSTRUTOR ---
-        // 3. Injetamos aqui o IFuncionarioRepository
         public AddArranjoViewModel(IArranjoRepository repository, IFuncionarioRepository funcionarioRepository)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _funcionarioRepository = funcionarioRepository ?? throw new ArgumentNullException(nameof(funcionarioRepository));
 
             RepairItems = new ObservableCollection<RepairItemViewModel>();
-            ListaFuncionarios = new ObservableCollection<Funcionario>(); // Inicializa a lista
+            ListaFuncionarios = new ObservableCollection<Funcionario>();
 
             SaveCommand = new ViewModelCommand(ExecuteSave);
 
-            // Inicializa a lista de sapatos
             UpdateList();
-
-            // 4. Carrega os funcionários para a ComboBox
             CarregarFuncionarios();
         }
 
         private void CarregarFuncionarios()
         {
             ListaFuncionarios.Clear();
-
-            // Vai buscar todos ao ficheiro JSON
             var todos = _funcionarioRepository.GetAll();
+            foreach (var f in todos) ListaFuncionarios.Add(f);
 
-            foreach (var f in todos)
-            {
-                ListaFuncionarios.Add(f);
-            }
-
-            // Seleciona o primeiro automaticamente (opcional, para não vir vazio)
-            if (ListaFuncionarios.Count > 0)
-            {
-                FuncionarioSelecionado = ListaFuncionarios[0];
-            }
+            if (ListaFuncionarios.Count > 0) FuncionarioSelecionado = ListaFuncionarios[0];
         }
 
         private void UpdateList()
@@ -123,30 +104,20 @@ namespace POOProject.ViewModels
 
         private void ExecuteSave(object? obj)
         {
-            if (string.IsNullOrWhiteSpace(NomeCliente))
-            {
-                MessageBox.Show("Preencha o nome do cliente.");
-                return;
-            }
+            // 1. Validações
+            if (string.IsNullOrWhiteSpace(NomeCliente)) { MessageBox.Show("Preencha o nome do cliente."); return; }
+            if (FuncionarioSelecionado == null) { MessageBox.Show("Selecione o Funcionário Responsável."); return; }
 
-            // 5. Validação: Obrigatório escolher funcionário
-            if (FuncionarioSelecionado == null)
-            {
-                MessageBox.Show("Selecione o Funcionário Responsável.");
-                return;
-            }
-
+            // 2. Criar Objeto Arranjo
             var novoArranjo = new Arranjo
             {
                 Cliente = new Cliente(NomeCliente, SobrenomeCliente),
-
-                // 6. Usa o funcionário selecionado na ComboBox em vez do "Admin" falso
                 FuncionarioResponsavel = FuncionarioSelecionado,
-
                 Estado = EstadoArranjo.Arranjar,
                 DataEntrada = DateTime.Now
             };
 
+            // 3. Adicionar Sapatos
             foreach (var vm in RepairItems)
             {
                 var calcado = new Calcado
@@ -156,7 +127,6 @@ namespace POOProject.ViewModels
                     Cor = vm.SelectedCor,
                     Descricao = vm.Description
                 };
-
                 foreach (var opcao in vm.AvailableServices)
                 {
                     if (opcao.IsSelected) calcado.ServicosParaFazer.Add(opcao.EnumValue);
@@ -164,8 +134,11 @@ namespace POOProject.ViewModels
                 novoArranjo.ListaCalcado.Add(calcado);
             }
 
+            // 4. Guardar na BD
             _repository.SaveArranjo(novoArranjo);
-            MessageBox.Show($"Talão {novoArranjo.Id} criado com sucesso!");
+
+            // 5. Mensagem Simples e Fechar Janela (VOLTOU AO ORIGINAL)
+            MessageBox.Show($"Talão {novoArranjo.Id} criado com sucesso!", "Sucesso");
             HideWindowAction?.Invoke();
         }
     }

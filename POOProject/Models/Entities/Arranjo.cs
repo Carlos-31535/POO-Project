@@ -23,5 +23,46 @@ namespace POOProject.Models.Entities
             Estado = EstadoArranjo.Arranjar; // Começa sempre como "Arranjar"
             DataEntrada = DateTime.Now;
         }
+
+        /// <summary>
+        /// Adiciona um par de sapatos, mas valida antes se o Cliente e Funcionário estão preenchidos.
+        /// </summary>
+        public void AdicionarCalcado(Calcado calcado)
+        {
+            // 1. Validar se o Sapato existe
+            if (calcado == null)
+            {
+                throw new ArgumentNullException("Não podes adicionar um registo de calçado vazio.");
+            }
+
+            // 2. Validar se o Cliente existe e tem nomes
+            if (this.Cliente == null)
+            {
+                throw new InvalidOperationException("Erro: Tens de selecionar um Cliente antes de adicionar sapatos.");
+            }
+
+            if (string.IsNullOrWhiteSpace(this.Cliente.FirstName) || string.IsNullOrWhiteSpace(this.Cliente.LastName))
+            {
+                throw new InvalidOperationException("O Cliente selecionado tem de ter Nome e Apelido válidos.");
+            }
+
+            // 3. Validar se o Funcionário Responsável existe
+            if (this.FuncionarioResponsavel == null)
+            {
+                throw new InvalidOperationException("Erro: O talão tem de ter um Funcionário responsável associado.");
+            }
+
+            // --- Se passou por tudo isto, adiciona à lista ---
+            this.ListaCalcado.Add(calcado);
+        }
+
+        /// <summary>
+        /// Calcula quantos pares existem neste talão.
+        /// Útil para mostrar na grelha ou no recibo.
+        /// </summary>
+        public int ObterQuantidadePares()
+        {
+            return ListaCalcado.Count;
+        }
     }
 }

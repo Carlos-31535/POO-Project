@@ -1,0 +1,48 @@
+﻿<Window x:Class="POOProject.Views.DetalhesTalaoView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Confirmação de Talão" Height="450" Width="400"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,0,2" Padding="0,0,0,10" Margin="0,0,0,10">
+            <StackPanel>
+                <TextBlock Text="{Binding TituloTalao}" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding InfoData}" FontSize="12" Foreground="Gray" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="1" Margin="0,0,0,15">
+            <TextBlock Text="{Binding InfoCliente}" FontSize="16" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding InfoFuncionario}" FontSize="12" Foreground="#555"/>
+        </StackPanel>
+
+        <DataGrid Grid.Row="2" 
+                  ItemsSource="{Binding ItensParaMostrar}" 
+                  AutoGenerateColumns="False" 
+                  CanUserAddRows="False" 
+                  IsReadOnly="True"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal"
+                  Background="White" BorderBrush="#DDD">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Artigo" Binding="{Binding Descricao}" Width="160" FontWeight="Bold"/>
+                <DataGridTextColumn Header="Serviços" Binding="{Binding ListaServicos}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button Grid.Row="3" 
+                Content="Fechar" 
+                Command="{Binding FecharCommand}" 
+                Height="35" Width="150" 
+                HorizontalAlignment="Center" 
+                Margin="0,15,0,0"/>
+    </Grid>
+</Window>

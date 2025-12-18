@@ -34,6 +34,7 @@ namespace POOProject
             services.AddTransient<MainViewModel>();
             services.AddTransient<AddArranjoViewModel>();
             services.AddTransient<CreateFuncionarioViewModel>();
+            services.AddTransient<DetalhesTalaoViewModel>();
 
             // Janelas
             services.AddTransient<LoginWindow>();
@@ -41,6 +42,7 @@ namespace POOProject
             services.AddTransient<MainWindow>();
             services.AddTransient<AddArranjoWindow>();
             services.AddTransient<CreateFuncionarioWindow>();
+            services.AddTransient<DetalhesTalaoView>();
 
             ServiceProvider = services.BuildServiceProvider();
         }

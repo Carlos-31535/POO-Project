@@ -1,15 +1,16 @@
-﻿using System;
+﻿using POOProject.Models.Entities;
+using POOProject.Models.Enums;
+using POOProject.Models.Repositories.Interfaces;
+using POOProject.ViewModels.Commands;
+using POOProject.Views;
+using POOProject.Views.Enums;
+using POOProject.Views.Interfaces;
+using System;
 using System.Collections.Generic; // Necessário para List<>
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using POOProject.Models.Entities;
-using POOProject.Models.Enums;
-using POOProject.Models.Repositories.Interfaces;
-using POOProject.ViewModels.Commands;
-using POOProject.Views.Enums;
-using POOProject.Views.Interfaces;
 
 namespace POOProject.ViewModels
 {
@@ -201,17 +202,19 @@ namespace POOProject.ViewModels
         private void ExecuteShowDetailsArranjos(Arranjo arranjo)
         {
             if (arranjo == null) return;
-            // (Lógica de detalhes igual ao anterior...)
-            string detalhes = $"Cliente: {arranjo.Cliente.FirstName} {arranjo.Cliente.LastName}\n";
-            detalhes += $"Data: {arranjo.DataEntrada}\n\n";
-            detalhes += "ITENS PARA ARRANJAR:\n";
 
-            foreach (var item in arranjo.ListaCalcado)
+            // 1. A Factory cria a Janela e o ViewModel (agora funciona porque o construtor é vazio)
+            Window window = _viewFactory.ShowDialog(ViewType.DetalhesTalao);
+
+            // 2. Obtemos o ViewModel que a Factory injetou no DataContext
+            if (window.DataContext is DetalhesTalaoViewModel vm)
             {
-                detalhes += $"- {item.NumPar} ({item.Tipo} - {item.Cor})\n";
-                detalhes += $"  Serviços: {string.Join(", ", item.ServicosParaFazer)}\n";
+                // 3. Injetamos o talão selecionado manualmente
+                vm.CarregarDados(arranjo);
             }
-            MessageBox.Show(detalhes, $"Talão #{arranjo.Id}");
+
+            // 4. Mostramos a janela
+            window.ShowDialog();
         }
     }
 }

@@ -31,8 +31,9 @@ namespace POOProject.Views.Enums
 
         AddArranjo,
 
-        CreateFuncionario
-        
+        CreateFuncionario,
+        DetalhesTalao
+
 
         #endregion
     }

@@ -42,6 +42,7 @@ namespace POOProject.Views.Factories
                 ViewType.Registry => _serviceProvider.GetRequiredService<RegistryWindow>(),
                 ViewType.AddArranjo => _serviceProvider.GetRequiredService<AddArranjoWindow>(),
                 ViewType.CreateFuncionario => _serviceProvider.GetRequiredService<CreateFuncionarioWindow>(),
+                ViewType.DetalhesTalao => _serviceProvider.GetRequiredService<DetalhesTalaoView>(),
                 _ => throw new NotImplementedException()
             };
 
@@ -52,6 +53,7 @@ namespace POOProject.Views.Factories
                 ViewType.Registry => _serviceProvider.GetRequiredService<RegistryViewModel>(),
                 ViewType.AddArranjo => _serviceProvider.GetRequiredService<AddArranjoViewModel>(),
                 ViewType.CreateFuncionario => _serviceProvider.GetRequiredService<CreateFuncionarioViewModel>(),
+                ViewType.DetalhesTalao => _serviceProvider.GetRequiredService<DetalhesTalaoViewModel>(),
                 _ => throw new NotImplementedException()
             };
 
@@ -75,6 +77,10 @@ namespace POOProject.Views.Factories
             else if (viewModel is CreateFuncionarioViewModel createVm)
             {
                 createVm.HideWindowAction = window.Close;
+            }
+            else if (viewModel is DetalhesTalaoViewModel detalhesVm)
+            {
+                detalhesVm.HideWindowAction = window.Close;
             }
 
             return window;
