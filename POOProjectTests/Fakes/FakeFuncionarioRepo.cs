@@ -3,7 +3,7 @@ using POOProject.Models.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace POOProjectTests
+namespace POOProjectTests.Fakes
 {
     public class FakeFuncionarioRepo : IFuncionarioRepository
     {

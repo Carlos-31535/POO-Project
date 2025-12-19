@@ -2,7 +2,7 @@ using POOProject.Models.Entities;
 using POOProject.Models.Repositories.Interfaces;
 using System.Collections.Generic;
 
-namespace POOProjectTests
+namespace POOProjectTests.Fakes
 {
     // Simula a base de dados de Arranjos em memória (List)
     public class FakeArranjoRepo : IArranjoRepository

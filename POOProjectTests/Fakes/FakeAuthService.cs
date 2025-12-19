@@ -1,7 +1,7 @@
 using POOProject.Models.Entities;
 using POOProject.ViewModels.Interfaces;
 
-namespace POOProjectTests
+namespace POOProjectTests.Fakes
 {
     public class FakeAuthService : IAuthenticationService
     {

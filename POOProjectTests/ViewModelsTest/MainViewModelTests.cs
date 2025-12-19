@@ -2,9 +2,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using POOProject.Models.Entities;
 using POOProject.Models.Enums;
 using POOProject.ViewModels;
+using POOProjectTests.Fakes;
 using System.Linq;
 
-namespace POOProjectTests
+namespace POOProjectTests.ViewModelsTest
 {
     [TestClass]
     public class MainViewModelTests

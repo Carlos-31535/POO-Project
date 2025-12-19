@@ -2,7 +2,7 @@ using System.Windows;
 using POOProject.Views.Enums;
 using POOProject.Views.Interfaces;
 
-namespace POOProjectTests
+namespace POOProjectTests.Fakes
 {
     public class FakeViewFactory : IViewFactory
     {

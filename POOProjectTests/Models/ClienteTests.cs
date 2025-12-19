@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using POOProject.Models.Entities;
 using System;
 
-namespace POOProjectTests
+namespace POOProjectTests.Models
 {
     [TestClass]
     public class ClienteTests

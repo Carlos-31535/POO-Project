@@ -1,9 +1,10 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using POOProject.Models.Entities;
-using POOProject.ViewModels.Services; 
+using POOProject.ViewModels.Services;
+using POOProjectTests.Fakes;
 
 
-namespace POOProjectTests
+namespace POOProjectTests.Services
 {
     [TestClass]
     public class AuthenticationServiceTests

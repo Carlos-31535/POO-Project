@@ -1,8 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using POOProject.ViewModels;
+using POOProjectTests.Fakes;
 using System.Linq;
 
-namespace POOProjectTests
+namespace POOProjectTests.ViewModelsTest
 {
     [TestClass]
     public class RegistryViewModelTests

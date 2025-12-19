@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using POOProject.Models.Entities;
 
-namespace POOProjectTests
+namespace POOProjectTests.Models
 {
     [TestClass]
     public class FuncionarioTests

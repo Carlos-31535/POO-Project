@@ -4,7 +4,7 @@ using POOProject.Models.Enums;
 using POOProject.ViewModels;
 using System;
 
-namespace POOProjectTests
+namespace POOProjectTests.ViewModelsTest
 {
     [TestClass]
     public class DetalhesTalaoViewModelTests

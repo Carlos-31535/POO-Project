@@ -4,7 +4,7 @@ using POOProject.Models.Enums;
 using System;
 // Já não precisas obrigatoriamente do System.Linq para aceder à lista, mas dá jeito.
 
-namespace POOProjectTests
+namespace POOProjectTests.Models
 {
     [TestClass]
     public class ArranjoTests

@@ -1,7 +1,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using POOProject.ViewModels;
+using POOProjectTests.Fakes;
 
-namespace POOProjectTests
+namespace POOProjectTests.ViewModelsTest
 {
     [TestClass]
     public class LoginViewModelTests
