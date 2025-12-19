@@ -1,98 +1,38 @@
-﻿
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
 using POOProject.ViewModels.Commands;
 using POOProject.ViewModels.Interfaces;
 using POOProject.Views.Enums;
 using POOProject.Views.Interfaces;
-using POOProject.ViewModels;
 
 namespace POOProject.ViewModels
 {
-    /// <summary>
-    /// ViewModel for login functionality. Handles authentication and navigation.
-    /// </summary>
     public class RegistryViewModel : BaseViewModel
     {
-        #region Fields
-
         private readonly IAuthenticationService _authenticationService;
         private readonly IViewFactory _viewFactory;
+
+        // Campos
         private string _username = string.Empty;
         private string _password = string.Empty;
         private string _passwordRepeat = string.Empty;
+        // NOVOS CAMPOS
+        private string _firstName = string.Empty;
+        private string _lastName = string.Empty;
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Action to hide the associated window. Typically set by the view.
-        /// </summary>
         public Action? HideWindowAction { get; set; }
-
-        /// <summary>
-        /// Command for executing the registry action.
-        /// </summary>
         public ICommand RegistryCommand { get; }
 
-        /// <summary>
-        /// Gets or sets the username entered by the user.
-        /// </summary>
-        public string Username
-        {
-            get => _username;
-            set
-            {
-                if (_username != value)
-                {
-                    _username = value;
-                    OnPropertyChanged(nameof(Username));
-                }
-            }
-        }
+        // --- PROPRIEDADES ---
+        public string Username { get => _username; set { _username = value; OnPropertyChanged(nameof(Username)); } }
+        public string Password { get => _password; set { _password = value; OnPropertyChanged(nameof(Password)); } }
+        public string PasswordRepeat { get => _passwordRepeat; set { _passwordRepeat = value; OnPropertyChanged(nameof(PasswordRepeat)); } }
 
-        /// <summary>
-        /// Gets or sets the password entered by the user.
-        /// </summary>
-        public string Password
-        {
-            get => _password;
-            set
-            {
-                if (_password != value)
-                {
-                    _password = value;
-                    OnPropertyChanged(nameof(Password));
-                }
-            }
-        }
+        // Novas Propriedades para o Binding da View
+        public string FirstName { get => _firstName; set { _firstName = value; OnPropertyChanged(nameof(FirstName)); } }
+        public string LastName { get => _lastName; set { _lastName = value; OnPropertyChanged(nameof(LastName)); } }
 
-        /// <summary>
-        /// Gets or sets the repeat password entered by the user.
-        /// </summary>
-        public string PasswordRepeat
-        {
-            get => _passwordRepeat;
-            set
-            {
-                if (_passwordRepeat != value)
-                {
-                    _passwordRepeat = value;
-                    OnPropertyChanged(nameof(PasswordRepeat));
-                }
-            }
-        }
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="LoginViewModel"/>.
-        /// </summary>
-        /// <param name="authenticationService">The authentication service to validate users.</param>
-        /// <param name="viewFactory">The factory to create views for navigation.</param>
         public RegistryViewModel(IAuthenticationService authenticationService, IViewFactory viewFactory)
         {
             _viewFactory = viewFactory ?? throw new ArgumentNullException(nameof(viewFactory));
@@ -101,28 +41,32 @@ namespace POOProject.ViewModels
             RegistryCommand = new ViewModelCommand(ExecuteRegistryCommand);
         }
 
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Executes the login command, validating credentials and navigating to the main view if successful.
-        /// </summary>
-        /// <param name="parameter">Optional command parameter (not used).</param>
         private void ExecuteRegistryCommand(object parameter)
         {
-            if (_authenticationService.CreateUser(Username, Password, PasswordRepeat))
+            // 1. Validações básicas
+            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName))
             {
+                MessageBox.Show("O Nome e Apelido são obrigatórios.", "Erro");
+                return;
+            }
+            if (Password != PasswordRepeat)
+            {
+                MessageBox.Show("As passwords não coincidem.", "Erro");
+                return;
+            }
+
+            // 2. Tentar Registar o Funcionário
+            if (_authenticationService.RegisterFuncionario(Username, Password, FirstName, LastName))
+            {
+                MessageBox.Show("Funcionário criado com sucesso!");
                 Window window = _viewFactory.ShowDialog(ViewType.Login);
                 HideWindowAction?.Invoke();
-                window.Show();
+                window?.Show();
             }
             else
             {
-                MessageBox.Show("Invalid username or password.", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Erro ao criar conta. Verifique se o username já existe.", "Erro", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-
-        #endregion
     }
 }

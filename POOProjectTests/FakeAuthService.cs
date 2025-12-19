@@ -1,20 +1,21 @@
 using POOProject.Models.Entities;
-using POOProject.Models.Repositories.Interfaces;
 using POOProject.ViewModels.Interfaces;
 
 namespace POOProjectTests
 {
     public class FakeAuthService : IAuthenticationService
     {
-        // --- AQUI ESTAVA O ERRO: Faltava esta propriedade ---
         public Funcionario CurrentFuncionario { get; set; }
 
-        public bool CreateUser(string username, string password, string confirmPassword)
+        // --- ESTE ERA O QUE FALTAVA ---
+        // Atualizámos para corresponder à nova interface
+        public bool RegisterFuncionario(string username, string password, string firstName, string lastName)
         {
-            return true; // Simula sucesso no registo
+            // Simula que o registo funcionou sempre bem nos testes
+            return true;
         }
 
-        public bool UserExists(string username, string password)
+        public bool Authenticate(string username, string password)
         {
             // Simula que apenas o user "admin" com pass "1234" é válido
             if (username == "admin" && password == "1234")

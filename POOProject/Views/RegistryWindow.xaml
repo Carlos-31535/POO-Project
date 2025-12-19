@@ -6,10 +6,9 @@
         xmlns:local="clr-namespace:POOProject.Views"
         mc:Ignorable="d"
         Title="Sapataria Manager - Registo"
-        Height="500" Width="800"
+        Height="600" Width="800"
         WindowStartupLocation="CenterScreen"
         Background="#F2F3F5"
-        
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display">
 
@@ -44,11 +43,41 @@
                                    FontSize="18"
                                    FontWeight="Bold"
                                    Foreground="#333"/>
-                        <TextBlock Text="Criar Nova Conta"
+                        <TextBlock Text="Registo de Funcionário"
                                    FontSize="12"
                                    Foreground="#888"/>
                     </StackPanel>
                 </StackPanel>
+
+                <TextBlock Text="Nome" Foreground="#555" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Height="35"
+                         Padding="10,0,10,0"
+                         VerticalContentAlignment="Center"
+                         Margin="0,0,0,15"
+                         Background="#F9F9F9"
+                         BorderBrush="#CCC">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+
+                <TextBlock Text="Apelido" Foreground="#555" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Height="35"
+                         Padding="10,0,10,0"
+                         VerticalContentAlignment="Center"
+                         Margin="0,0,0,15"
+                         Background="#F9F9F9"
+                         BorderBrush="#CCC">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
 
                 <TextBlock Text="Username" Foreground="#555" Margin="0,0,0,5" FontWeight="SemiBold"/>
                 <TextBox Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

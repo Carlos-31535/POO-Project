@@ -1,83 +1,63 @@
-﻿using POOProject.Models.Repositories.Interfaces;
+﻿using POOProject.Models.Entities;
+using POOProject.Models.Repositories.Interfaces;
 using POOProject.ViewModels.Interfaces;
-using POOProject.Models.Entities;
+using System;
 
 namespace POOProject.ViewModels.Services
 {
-    /// <summary>
-    /// Provides authentication services to validate users.
-    /// </summary>
     public class AuthenticationService : IAuthenticationService
     {
-        #region Fields
-
-        private readonly IUserRepository _userRepository;
+        // MUDANÇA: Só precisamos deste repositório! O UserRepository morreu. 💀
         private readonly IFuncionarioRepository _funcionarioRepository;
 
         public Funcionario? CurrentFuncionario { get; private set; }
 
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="AuthenticationService"/> with a user repository.
-        /// </summary>
-        /// <param name="userRepository">Repository used to fetch user data.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="userRepository"/> is null.</exception>
-        public AuthenticationService(IUserRepository userRepository, IFuncionarioRepository funcionarioRepository)
+        public AuthenticationService(IFuncionarioRepository funcionarioRepository)
         {
-            _userRepository = userRepository;
-            _funcionarioRepository = funcionarioRepository;
+            _funcionarioRepository = funcionarioRepository ?? throw new ArgumentNullException(nameof(funcionarioRepository));
         }
 
-        #endregion
-
-        #region Public Methods
-
-        /// <summary>
-        /// Checks if a user with the specified username and password exists.
-        /// </summary>
-        /// <param name="username">The username of the user.</param>
-        /// <param name="password">The password of the user.</param>
-        /// <returns>True if a user exists and the password matches; otherwise, false.</returns>
-        public bool UserExists(string username, string password)
+        public bool Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) return false;
 
-            var user = _userRepository.GetUserByUsername(username);
+            // Vai buscar o funcionário diretamente pelo username
+            var func = _funcionarioRepository.GetByUsername(username);
 
-            if (user != null && user.Password == password)
+            // Verifica se existe e a pass bate certo
+            if (func != null && func.Password == password)
             {
-                // --- FALTA ESTA LÓGICA DE CARREGAR O PERFIL ---
-                var perfil = _funcionarioRepository.GetByUsername(username);
-
-                if (perfil != null)
-                    CurrentFuncionario = perfil;
-                else
-                    CurrentFuncionario = new Funcionario("", "", 0) { Username = username };
-
+                CurrentFuncionario = func;
                 return true;
             }
             return false;
         }
 
-        public bool CreateUser(string username, string password, string passwordRepeat)
+        public bool RegisterFuncionario(string username, string password, string firstName, string lastName)
         {
-            // Return false if username or password is null or empty
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(passwordRepeat))
+            // 1. Verificar se o username já está ocupado
+            if (_funcionarioRepository.GetByUsername(username) != null)
+                return false;
+
+            try
+            {
+                // 2. Criar o Objeto FUNCIONÁRIO diretamente
+                // O construtor obriga a ter Nome e Apelido, resolvendo o teu erro da classe Pessoa!
+                // O ID (0) será gerado automaticamente pela base de dados/repositório
+                var novoFuncionario = new Funcionario(firstName, lastName, 0);
+
+                // Preencher dados de Login
+                novoFuncionario.Username = username;
+                novoFuncionario.Password = password;
+
+                // 3. Gravar na tabela de funcionários
+                _funcionarioRepository.SaveOrUpdate(novoFuncionario);
+                return true;
+            }
+            catch
             {
                 return false;
             }
-
-            if (password == passwordRepeat)
-            {
-                return _userRepository.CreateUser(username, password);
-            }
-
-            return false;
         }
-
-        #endregion
     }
 }

@@ -101,7 +101,7 @@ namespace POOProject.ViewModels
         /// <param name="parameter">Optional command parameter (not used).</param>
         private void ExecuteLoginCommand(object parameter)
         {
-            if (_authenticationService.UserExists(Username, Password))
+            if (_authenticationService.Authenticate(Username, Password))
             {
                 Window window = _viewFactory.ShowDialog(ViewType.Main);
                 HideWindowAction?.Invoke();

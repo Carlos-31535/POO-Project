@@ -22,7 +22,6 @@ namespace POOProject
             var services = new ServiceCollection();
 
             // Repositórios e Serviços (Mantém estes, são importantes!)
-            services.AddSingleton<IUserRepository, UserRepository>();
             services.AddSingleton<IFuncionarioRepository, FuncionarioRepository>();
             services.AddSingleton<IArranjoRepository, ArranjoRepository>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
