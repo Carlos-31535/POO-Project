@@ -39,6 +39,8 @@ namespace POOProject.ViewModels
         /// </summary>
         public ICommand RegistryCommand { get; }
 
+        public Action<string> MessageBoxAction { get; set; } = (msg) => MessageBox.Show(msg);
+
         /// <summary>
         /// Gets or sets the username entered by the user.
         /// </summary>
@@ -107,7 +109,7 @@ namespace POOProject.ViewModels
             }
             else
             {
-                MessageBox.Show("Invalid username or password.", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBoxAction("Invalid username or password.");
             }
         }
 
