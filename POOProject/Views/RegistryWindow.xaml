@@ -5,19 +5,113 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:POOProject.Views"
         mc:Ignorable="d"
-        Title="RegistryWindow" Height="450" Width="800">
+        Title="Sapataria Manager - Registo"
+        Height="500" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#F2F3F5"
+        
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display">
+
     <Grid>
-        <StackPanel Background="Beige" Width="200px" Height="150px" >
-            <Label Content="Username"></Label>
-            <TextBox Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Label Content="Password"></Label>
-            <TextBox Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Label Content="Repeat Password"></Label>
+        <Border Width="380"
+                Padding="30"
+                Background="White"
+                CornerRadius="8"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                BorderBrush="#DDD"
+                BorderThickness="1">
 
-            <TextBox Text="{Binding PasswordRepeat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" Direction="270" ShadowDepth="2" Opacity="0.1"/>
+            </Border.Effect>
 
-            <Button Content="Registry" Command="{Binding RegistryCommand}" />
+            <StackPanel>
 
-        </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,25">
+                    <Border Width="50" Height="50" CornerRadius="25" Background="#009688" Margin="0,0,10,0">
+                        <TextBlock Text="RS"
+                                   Foreground="White"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Sapataria Manager"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="#333"/>
+                        <TextBlock Text="Criar Nova Conta"
+                                   FontSize="12"
+                                   Foreground="#888"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <TextBlock Text="Username" Foreground="#555" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Height="35"
+                         Padding="10,0,10,0"
+                         VerticalContentAlignment="Center"
+                         Margin="0,0,0,15"
+                         Background="#F9F9F9"
+                         BorderBrush="#CCC">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+
+                <TextBlock Text="Password" Foreground="#555" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Height="35"
+                         Padding="10,0,10,0"
+                         VerticalContentAlignment="Center"
+                         Margin="0,0,0,15"
+                         Background="#F9F9F9"
+                         BorderBrush="#CCC">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+
+                <TextBlock Text="Repetir Password" Foreground="#555" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding PasswordRepeat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Height="35"
+                         Padding="10,0,10,0"
+                         VerticalContentAlignment="Center"
+                         Margin="0,0,0,25"
+                         Background="#F9F9F9"
+                         BorderBrush="#CCC">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+
+                <Button Content="Registar Conta"
+                        Command="{Binding RegistryCommand}"
+                        Height="40"
+                        Background="#009688"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Margin="0,0,0,10">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
