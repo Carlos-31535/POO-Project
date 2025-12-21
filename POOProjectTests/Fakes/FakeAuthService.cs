@@ -3,24 +3,27 @@ using POOProject.ViewModels.Interfaces;
 
 namespace POOProjectTests.Fakes
 {
+    /// <summary>
+    /// Serviço de Autenticação Falso.
+    /// Permite testar o LoginViewModel sem depender da base de dados de utilizadores reais.
+    /// </summary>
     public class FakeAuthService : IAuthenticationService
     {
         public Funcionario CurrentFuncionario { get; set; }
 
-        // --- ESTE ERA O QUE FALTAVA ---
-        // Atualizámos para corresponder à nova interface
         public bool RegisterFuncionario(string username, string password, string firstName, string lastName)
         {
-            // Simula que o registo funcionou sempre bem nos testes
+            // Para efeitos de teste do ViewModel, assumimos que o registo funciona sempre.
+            // Se quiséssemos testar falhas, poderíamos mudar isto para retornar false se username == "erro".
             return true;
         }
 
         public bool Authenticate(string username, string password)
         {
-            // Simula que apenas o user "admin" com pass "1234" é válido
+            // Hardcoded para testes controlados.
+            // Sabemos sempre que "admin" + "1234" tem de dar sucesso.
             if (username == "admin" && password == "1234")
             {
-                // Simulamos que ao fazer login, o sistema carrega o funcionário
                 CurrentFuncionario = new Funcionario("Administrador", "Sistema", 1);
                 return true;
             }

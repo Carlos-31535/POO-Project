@@ -4,10 +4,14 @@ using System.Collections.Generic;
 
 namespace POOProjectTests.Fakes
 {
-    // Simula a base de dados de Arranjos em memória (List)
+    /// <summary>
+    /// Simula a persistência de Arranjos.
+    /// Útil para verificar se o botão "Gravar" do ViewModel chamou realmente o repositório.
+    /// </summary>
     public class FakeArranjoRepo : IArranjoRepository
     {
-        // Deixamos público para o teste poder ver o que foi gravado
+        // Deixamos público propositadamente para o Teste Unitário poder consultar (Spy).
+        // Exemplo de teste: Assert.AreEqual(1, repo.ArranjosGravados.Count);
         public List<Arranjo> ArranjosGravados = new List<Arranjo>();
 
         public void SaveArranjo(Arranjo arranjo)
@@ -17,12 +21,12 @@ namespace POOProjectTests.Fakes
 
         public List<Arranjo> GetAllArranjos()
         {
-            // Retorna uma cópia da lista para simular o comportamento real
             return new List<Arranjo>(ArranjosGravados);
         }
 
         public void Update(Arranjo arranjo)
         {
+            // Simula a atualização de estado (ex: marcar como Pronto)
             var index = ArranjosGravados.FindIndex(a => a.Id == arranjo.Id);
             if (index != -1)
             {

@@ -1,4 +1,4 @@
-﻿using POOProject.Models.Enums; 
+﻿using POOProject.Models.Enums;
 using POOProject.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -7,15 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace POOProject.ViewModels
 {
-    // Representa UMA Checkbox de serviço (Ex: [x] Colar)
+    // ViewModel auxiliar que representa uma opção de Checkbox na interface.
+    // Permite fazer Binding do estado "IsSelected" diretamente para o WPF.
     public class ServiceOptionViewModel : BaseViewModel
     {
         private bool _isSelected;
-        public string Name { get; set; } = "";    // Texto para o ecrã
-        public Servicos EnumValue { get; set; }   // Valor real do Enum
+        public string Name { get; set; } = "";
+        public Servicos EnumValue { get; set; }
 
         public bool IsSelected
         {
@@ -24,21 +24,20 @@ namespace POOProject.ViewModels
         }
     }
 
-    // Representa UM Par de Sapatos no ecrã (com as suas comboboxes e checkboxes)
+    // ViewModel auxiliar para representar cada par de sapatos na lista de criação.
+    // Agrupa as características (Cor, Tipo) e os serviços a realizar nesse par.
     public class RepairItemViewModel : BaseViewModel
     {
-        public string Title { get; set; } = "";      // "Par 1"
-        public string Description { get; set; } = ""; // "Sola partida"
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
 
-        // Dados selecionados nas ComboBoxes
         public TipoCalcado SelectedTipo { get; set; }
         public CorCalcado SelectedCor { get; set; }
 
-        // Listas para encher as ComboBoxes (Binding)
+        // Fontes de dados para preencher as ComboBoxes (converte Enums para lista)
         public IEnumerable<TipoCalcado> TiposDisponiveis => Enum.GetValues(typeof(TipoCalcado)).Cast<TipoCalcado>();
         public IEnumerable<CorCalcado> CoresDisponiveis => Enum.GetValues(typeof(CorCalcado)).Cast<CorCalcado>();
 
-        // Lista de Checkboxes (Colar, Coser, etc.)
         public ObservableCollection<ServiceOptionViewModel> AvailableServices { get; set; }
             = new ObservableCollection<ServiceOptionViewModel>();
     }

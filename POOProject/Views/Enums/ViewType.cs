@@ -1,41 +1,19 @@
-﻿
-namespace POOProject.Views.Enums
+﻿namespace POOProject.Views.Enums
 {
     /// <summary>
-    /// Specifies the types of views available in the application.
+    /// Catálogo de todas as janelas disponíveis na aplicação.
+    /// Usado pela Factory para saber o que criar.
     /// </summary>
     public enum ViewType
     {
-        #region View Types
-
-        /// <summary>
-        /// Represents the login view.
-        /// </summary>
         Login,
-
-        /// <summary>
-        /// Represents the main application view.
-        /// </summary>
         Main,
-
-        /// <summary>
-        /// Represents the registry application view.
-        /// </summary>
         Registry,
 
-        /// <summary>
-        /// Represents the create employee application view.
-        /// </summary>
+        // Janelas de diálogo / formulários
         EditEmployee,
-
-
         AddArranjo,
-
         CreateFuncionario,
-
         DetalhesTalao
-
-
-        #endregion
     }
 }

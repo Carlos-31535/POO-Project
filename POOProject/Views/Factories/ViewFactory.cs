@@ -7,11 +7,12 @@ using POOProject.Views.Interfaces;
 namespace POOProject.Views.Factories
 {
     /// <summary>
-    /// Factory responsible for creating WPF Window instances based on the requested <see cref="ViewType"/>.
-    /// This class centralizes the creation logic and ensures consistent initialization of windows.
+    /// Fábrica responsável por instanciar todas as janelas e os seus respetivos ViewModels.
+    /// Centraliza a lógica de criação (Pattern Factory) e resolve dependências automaticamente.
     /// </summary>
     public class ViewFactory : IViewFactory
     {
+        // O "saco" de serviços onde estão registados todos os ViewModels e Repositórios
         private readonly IServiceProvider _serviceProvider;
 
         public ViewFactory(IServiceProvider serviceProvider)
@@ -19,22 +20,10 @@ namespace POOProject.Views.Factories
             _serviceProvider = serviceProvider;
         }
 
-        #region Public Methods
-
-        /// <summary>
-        /// Creates and returns a WPF <see cref="Window"/> corresponding to the specified <see cref="ViewType"/>.
-        /// Optionally accepts a parameter used for initializing windows that require input.
-        /// </summary>
-        /// <param name="type">The type of view to create.</param>
-        /// <param name="parameter">
-        /// Optional parameter used during window construction (e.g., passing data to MainWindow).
-        /// </param>
-        /// <returns>A fully constructed WPF <see cref="Window"/> instance.</returns>
-        /// <exception cref="NotImplementedException">
-        /// Thrown when the specified <see cref="ViewType"/> does not have a corresponding Window.
-        /// </exception>
         public Window ShowDialog(ViewType type, object? parameter = null)
         {
+            // 1. Criar a Janela (View)
+            // O GetRequiredService vai ao App.xaml.cs procurar a configuração desta janela
             Window window = type switch
             {
                 ViewType.Login => _serviceProvider.GetRequiredService<LoginWindow>(),
@@ -43,9 +32,10 @@ namespace POOProject.Views.Factories
                 ViewType.AddArranjo => _serviceProvider.GetRequiredService<AddArranjoWindow>(),
                 ViewType.CreateFuncionario => _serviceProvider.GetRequiredService<CreateFuncionarioWindow>(),
                 ViewType.DetalhesTalao => _serviceProvider.GetRequiredService<DetalhesTalaoView>(),
-                _ => throw new NotImplementedException()
+                _ => throw new NotImplementedException("Janela não configurada na Factory.")
             };
 
+            // 2. Criar o Cérebro (ViewModel) correspondente
             object viewModel = type switch
             {
                 ViewType.Login => _serviceProvider.GetRequiredService<LoginViewModel>(),
@@ -54,16 +44,18 @@ namespace POOProject.Views.Factories
                 ViewType.AddArranjo => _serviceProvider.GetRequiredService<AddArranjoViewModel>(),
                 ViewType.CreateFuncionario => _serviceProvider.GetRequiredService<CreateFuncionarioViewModel>(),
                 ViewType.DetalhesTalao => _serviceProvider.GetRequiredService<DetalhesTalaoViewModel>(),
-                _ => throw new NotImplementedException()
+                _ => throw new NotImplementedException("ViewModel não configurado.")
             };
 
+            // 3. Ligar os dois (DataBinding)
             window.DataContext = viewModel;
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
-            //Fechar janelas
+            // 4. Configurar o fecho da janela (MVVM Puro)
+            // Como o ViewModel não pode fechar a janela diretamente (não conhece a View),
+            // passamos uma Action que o ViewModel pode chamar quando quiser fechar-se.
             if (viewModel is LoginViewModel loginVm)
             {
-                
                 loginVm.HideWindowAction = window.Close;
             }
             else if (viewModel is RegistryViewModel registryVm)
@@ -85,7 +77,5 @@ namespace POOProject.Views.Factories
 
             return window;
         }
-
-        #endregion
     }
 }

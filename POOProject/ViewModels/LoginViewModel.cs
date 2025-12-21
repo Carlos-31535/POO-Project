@@ -1,5 +1,4 @@
-﻿
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using POOProject.ViewModels.Commands;
 using POOProject.ViewModels.Interfaces;
@@ -8,42 +7,23 @@ using POOProject.Views.Interfaces;
 
 namespace POOProject.ViewModels
 {
-    /// <summary>
-    /// ViewModel for login functionality. Handles authentication and navigation.
-    /// </summary>
     public class LoginViewModel : BaseViewModel
     {
-        #region Fields
-
         private readonly IAuthenticationService _authenticationService;
         private readonly IViewFactory _viewFactory;
+
         private string _username = string.Empty;
         private string _password = string.Empty;
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Action to hide the associated window. Typically set by the view.
-        /// </summary>
+        // Ação delegada à View para fechar a janela (respeitando o MVVM puro).
         public Action? HideWindowAction { get; set; }
 
-        /// <summary>
-        /// Command for executing the login action.
-        /// </summary>
         public ICommand LoginCommand { get; }
-
-        /// <summary>
-        /// Command for executing the registry action.
-        /// </summary>
         public ICommand RegistryCommand { get; }
 
+        // Permite substituir o MessageBox real por um Mock durante os testes unitários.
         public Action<string> MessageBoxAction { get; set; } = (msg) => MessageBox.Show(msg);
 
-        /// <summary>
-        /// Gets or sets the username entered by the user.
-        /// </summary>
         public string Username
         {
             get => _username;
@@ -57,9 +37,6 @@ namespace POOProject.ViewModels
             }
         }
 
-        /// <summary>
-        /// Gets or sets the password entered by the user.
-        /// </summary>
         public string Password
         {
             get => _password;
@@ -73,15 +50,7 @@ namespace POOProject.ViewModels
             }
         }
 
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="LoginViewModel"/>.
-        /// </summary>
-        /// <param name="authenticationService">The authentication service to validate users.</param>
-        /// <param name="viewFactory">The factory to create views for navigation.</param>
+        // Injetamos os serviços necessários para não depender de implementações concretas.
         public LoginViewModel(IAuthenticationService authenticationService, IViewFactory viewFactory)
         {
             _viewFactory = viewFactory ?? throw new ArgumentNullException(nameof(viewFactory));
@@ -91,35 +60,28 @@ namespace POOProject.ViewModels
             RegistryCommand = new ViewModelCommand(ExecuteRegistryCommand);
         }
 
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Executes the login command, validating credentials and navigating to the main view if successful.
-        /// </summary>
-        /// <param name="parameter">Optional command parameter (not used).</param>
         private void ExecuteLoginCommand(object parameter)
         {
+            // Valida as credenciais contra a "base de dados"
             if (_authenticationService.Authenticate(Username, Password))
             {
+                // Se sucesso, abre a janela principal e fecha a atual
                 Window window = _viewFactory.ShowDialog(ViewType.Main);
                 HideWindowAction?.Invoke();
                 window?.Show();
             }
             else
             {
-                MessageBoxAction("Invalid username or password.");
+                MessageBoxAction("Username ou password incorretos.");
             }
         }
 
         private void ExecuteRegistryCommand(object param)
         {
+            // Navega para o ecrã de criação de conta
             Window window = _viewFactory.ShowDialog(ViewType.Registry);
             HideWindowAction?.Invoke();
             window?.Show();
         }
-
-        #endregion
     }
 }

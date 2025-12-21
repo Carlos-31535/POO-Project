@@ -8,7 +8,6 @@ namespace POOProject.ViewModels
 {
     public class DetalhesTalaoViewModel : BaseViewModel
     {
-        // Propriedades com notificação
         private string _tituloTalao = string.Empty;
         private string _infoCliente = string.Empty;
         private string _infoData = string.Empty;
@@ -43,14 +42,14 @@ namespace POOProject.ViewModels
         public ICommand FecharCommand { get; }
         public Action? HideWindowAction { get; set; }
 
-        // Construtor Vazio (Obrigatório para a Factory)
         public DetalhesTalaoViewModel()
         {
             ItensParaMostrar = new ObservableCollection<ItemDisplay>();
             FecharCommand = new RelayCommand<object>(_ => HideWindowAction?.Invoke());
         }
 
-        // Método chamado pelo MainViewModel depois de abrir a janela
+        // Recebe a entidade Arranjo completa e formata os dados para strings simples
+        // que a View consegue mostrar sem conversores complexos.
         public void CarregarDados(Arranjo arranjo)
         {
             if (arranjo == null) return;
@@ -66,12 +65,14 @@ namespace POOProject.ViewModels
                 ItensParaMostrar.Add(new ItemDisplay
                 {
                     Descricao = $"{item.NumPar} - {item.Tipo} ({item.Cor})",
+                    // Junta todos os serviços numa string separada por vírgulas
                     ListaServicos = string.Join(", ", item.ServicosParaFazer)
                 });
             }
         }
     }
 
+    // Classe DTO (Data Transfer Object) simples apenas para apresentação nesta lista
     public class ItemDisplay
     {
         public string Descricao { get; set; }

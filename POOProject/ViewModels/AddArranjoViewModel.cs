@@ -15,16 +15,14 @@ namespace POOProject.ViewModels
         private readonly IArranjoRepository _repository;
         private readonly IFuncionarioRepository _funcionarioRepository;
 
-        // --- NOVO: Ação para mostrar mensagens (Testável!) ---
-        // Por defeito, usa a MessageBox real. Nos testes, vamos mudar isto.
+        // Abstração da MessageBox para permitir testes unitários (unit testing)
         public Action<string> ShowMessageAction { get; set; } = (msg) => MessageBox.Show(msg);
 
-        // Dados do Formulário
         private string _nomeCliente = string.Empty;
         private string _sobrenomeCliente = string.Empty;
         private int _numeroPares = 1;
 
-        // --- LISTAS E SELEÇÕES ---
+        // Lista dinâmica que cresce conforme o número de pares escolhido
         public ObservableCollection<RepairItemViewModel> RepairItems { get; set; }
         public ObservableCollection<Funcionario> ListaFuncionarios { get; set; }
 
@@ -57,6 +55,7 @@ namespace POOProject.ViewModels
             {
                 _numeroPares = value;
                 OnPropertyChanged(nameof(NumeroPares));
+                // Recria a lista de formulários sempre que mudamos a quantidade
                 UpdateList();
             }
         }
@@ -81,6 +80,7 @@ namespace POOProject.ViewModels
             var todos = _funcionarioRepository.GetAll();
             foreach (var f in todos) ListaFuncionarios.Add(f);
 
+            // Pré-seleciona o primeiro para agilizar
             if (ListaFuncionarios.Count > 0) FuncionarioSelecionado = ListaFuncionarios[0];
         }
 
@@ -89,9 +89,12 @@ namespace POOProject.ViewModels
             RepairItems.Clear();
             var todosServicos = Enum.GetValues(typeof(Servicos)).Cast<Servicos>().ToList();
 
+            // Cria N formulários de sapatos (Par 1, Par 2...)
             for (int i = 1; i <= NumeroPares; i++)
             {
                 var itemVM = new RepairItemViewModel { Title = $"Par {i}" };
+
+                // Preenche as checkboxes de serviços para cada par
                 foreach (var servicoEnum in todosServicos)
                 {
                     itemVM.AvailableServices.Add(new ServiceOptionViewModel
@@ -107,23 +110,24 @@ namespace POOProject.ViewModels
 
         private void ExecuteSave(object? obj)
         {
+            // Validações de entrada
             if (string.IsNullOrWhiteSpace(NomeCliente))
             {
-                ShowMessageAction("Preencha o nome do cliente."); // USAR NOVA AÇÃO
+                ShowMessageAction("Preencha o nome do cliente.");
                 return;
             }
             if (FuncionarioSelecionado == null)
             {
-                ShowMessageAction("Selecione o Funcionário Responsável."); // USAR NOVA AÇÃO
+                ShowMessageAction("Selecione o Funcionário Responsável.");
                 return;
             }
 
+            // Garante que cada sapato tem pelo menos um serviço marcado
             foreach (var item in RepairItems)
             {
                 bool temServico = item.AvailableServices.Any(s => s.IsSelected);
                 if (!temServico)
                 {
-                    // USAR NOVA AÇÃO
                     ShowMessageAction($"O '{item.Title}' não tem nenhum serviço selecionado.\nSelecione pelo menos um serviço.");
                     return;
                 }
@@ -131,6 +135,7 @@ namespace POOProject.ViewModels
 
             try
             {
+                // Conversão: ViewModels -> Entidades de Domínio
                 var cliente = new Cliente(NomeCliente, SobrenomeCliente);
                 var novoArranjo = new Arranjo(cliente, FuncionarioSelecionado);
 
@@ -144,6 +149,7 @@ namespace POOProject.ViewModels
                         Descricao = vm.Description
                     };
 
+                    // Mapear apenas os serviços que foram marcados com 'Check'
                     foreach (var opcao in vm.AvailableServices)
                     {
                         if (opcao.IsSelected) calcado.ServicosParaFazer.Add(opcao.EnumValue);
@@ -153,12 +159,12 @@ namespace POOProject.ViewModels
 
                 _repository.SaveArranjo(novoArranjo);
 
-                ShowMessageAction($"Talão {novoArranjo.Id} criado com sucesso!"); // USAR NOVA AÇÃO
+                ShowMessageAction($"Talão {novoArranjo.Id} criado com sucesso!");
                 HideWindowAction?.Invoke();
             }
             catch (Exception ex)
             {
-                ShowMessageAction($"Erro: {ex.Message}"); // USAR NOVA AÇÃO
+                ShowMessageAction($"Erro: {ex.Message}");
             }
         }
     }

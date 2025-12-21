@@ -6,21 +6,39 @@ using System.Threading.Tasks;
 
 namespace POOProject.Models.Entities
 {
+    /// <summary>
+    /// Representa um utilizador do sistema (Staff).
+    /// Herda de Pessoa para reaproveitar Nome/Apelido e validações.
+    /// </summary>
     public class Funcionario : Pessoa
     {
+        
+
+        // Identificador numérico único (usado para ligar aos Arranjos)
         public int Id { get; set; }
+
+       
+
         public string Username { get; set; }
 
-        // --- ADICIONADO: Agora o Funcionário guarda a sua própria password ---
+        // A password fica guardada diretamente no funcionário para simplificar o login.
+        // (Num sistema real, isto devia estar encriptado/hash).
         public string Password { get; set; }
 
+     
+
         public Funcionario(string firstName, string lastName, int id)
-            : base(firstName, lastName) // Chama o construtor da Pessoa
+            : base(firstName, lastName) // Passa os nomes para a classe Pai validar
         {
             Id = id;
-            // Gera um username default (pode ser alterado depois)
+
+            // Lógica de conveniência:
+            // Gera automaticamente um username (ex: "joao.silva") para não ter de escrever sempre.
             Username = $"{firstName}.{lastName}".ToLower();
-            Password = "123"; // Password temporária por defeito (opcional)
+
+            // Password inicial por defeito para agilizar a criação de contas.
+            // O funcionário pode mudar depois (se implementarmos essa funcionalidade).
+            Password = "123";
         }
     }
 }

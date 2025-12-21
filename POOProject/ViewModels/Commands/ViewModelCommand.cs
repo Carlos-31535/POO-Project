@@ -1,90 +1,63 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 
 namespace POOProject.ViewModels.Commands
 {
     /// <summary>
-    /// A command implementation that wraps execute and can-execute delegates for MVVM binding.
+    /// Classe genérica que implementa ICommand.
+    /// É a peça fundamental do MVVM que permite ligar botões da View a métodos do ViewModel
+    /// sem usar eventos "Click" no code-behind.
     /// </summary>
     public class ViewModelCommand : ICommand
     {
-        #region Delegates
+        // --- DELEGATES ---
+        // Guardam as funções que devem ser executadas quando o botão é clicado.
 
-        /// <summary>
-        /// Delegate for the command's execute action.
-        /// </summary>
-        /// <param name="parameter">The command parameter.</param>
+        // Ação principal (o que o comando faz)
         public delegate void ICommandOnExecute(object? parameter);
 
-        /// <summary>
-        /// Delegate for the command's can-execute function.
-        /// </summary>
-        /// <param name="parameter">The command parameter.</param>
-        /// <returns>True if the command can execute, otherwise false.</returns>
+        // Validação (se o botão deve estar ativo ou cinzento/disabled)
         public delegate bool ICommandOnCanExecute(object? parameter);
 
-        #endregion
-
-        #region Fields
-
+        // --- CAMPOS ---
         private readonly ICommandOnExecute _execute;
         private readonly ICommandOnCanExecute? _canExecute;
 
-        #endregion
+        // --- CONSTRUTORES ---
 
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="ViewModelCommand"/> with an execute delegate.
-        /// </summary>
-        /// <param name="onExecuteMethod">The execute delegate.</param>
+        // Construtor simples: O comando está sempre disponível para executar
         public ViewModelCommand(ICommandOnExecute onExecuteMethod)
         {
             _execute = onExecuteMethod ?? throw new ArgumentNullException(nameof(onExecuteMethod));
         }
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="ViewModelCommand"/> with execute and can-execute delegates.
-        /// </summary>
-        /// <param name="onExecuteMethod">The execute delegate.</param>
-        /// <param name="onCanExecuteMethod">The can-execute delegate.</param>
+        // Construtor completo: Inclui lógica para ativar/desativar o botão
         public ViewModelCommand(ICommandOnExecute onExecuteMethod, ICommandOnCanExecute onCanExecuteMethod)
         {
             _execute = onExecuteMethod ?? throw new ArgumentNullException(nameof(onExecuteMethod));
             _canExecute = onCanExecuteMethod ?? throw new ArgumentNullException(nameof(onCanExecuteMethod));
         }
 
-        #endregion
+        // --- INTERFACE ICOMMAND ---
 
-        #region ICommand Members
-
-        /// <summary>
-        /// Occurs when changes occur that affect whether the command should execute.
-        /// </summary>
+        // Evento mágico do WPF: avisa a interface gráfica para reavaliar se o botão deve estar ativo.
+        // O CommandManager.RequerySuggested faz isso automaticamente quando o utilizador mexe na UI.
         public event EventHandler? CanExecuteChanged
         {
             add => CommandManager.RequerySuggested += value;
             remove => CommandManager.RequerySuggested -= value;
         }
 
-        /// <summary>
-        /// Determines whether the command can execute in its current state.
-        /// </summary>
-        /// <param name="parameter">Data used by the command.</param>
-        /// <returns>True if this command can be executed; otherwise, false.</returns>
+        // Pergunta ao ViewModel: "Posso correr agora?" (Ex: O botão Login só ativa se tiver texto nas caixas)
         public bool CanExecute(object? parameter)
         {
             return _canExecute?.Invoke(parameter) ?? true;
         }
 
-        /// <summary>
-        /// Executes the command.
-        /// </summary>
-        /// <param name="parameter">Data used by the command.</param>
+        // Executa a lógica real
         public void Execute(object? parameter)
         {
             _execute.Invoke(parameter);
         }
-
-        #endregion
     }
 }

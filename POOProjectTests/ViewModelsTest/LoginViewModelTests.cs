@@ -14,27 +14,23 @@ namespace POOProjectTests.ViewModelsTest
         [TestInitialize]
         public void Setup()
         {
+            // Montamos o puzzle com peças falsas
             _authService = new FakeAuthService();
             _viewFactory = new FakeViewFactory();
             _vm = new LoginViewModel(_authService, _viewFactory);
 
-            // Silenciar mensagens
+            // Evita que pop-ups reais apareçam durante os testes
             _vm.MessageBoxAction = (msg) => { };
         }
 
         [TestMethod]
         public void Login_ComCredenciaisValidas_DeveSucesso()
         {
-            // 1. Arrange - Dados corretos (definidos no FakeAuthService)
+            // 1. Arrange - Dados que sabemos que o FakeAuthService aceita
             _vm.Username = "admin";
             _vm.Password = "1234";
 
-            bool janelaAbriu = false;
-            // "Hack" simples: se o método ShowDialog do FakeViewFactory for chamado, sabemos que o login passou.
-            // Para isto funcionar, teríamos de adicionar lógica ao FakeViewFactory, 
-            // mas podemos testar indiretamente: se NÃO deu erro, assumimos sucesso no fluxo simples.
-
-            // Uma forma melhor é capturar a mensagem de erro. Se não houver mensagem, é sucesso.
+            // Captura de erros para validar sucesso silencioso
             string erro = "";
             _vm.MessageBoxAction = (msg) => erro = msg;
 
@@ -42,13 +38,15 @@ namespace POOProjectTests.ViewModelsTest
             _vm.LoginCommand.Execute(null);
 
             // 3. Assert
+            // Se não houve mensagem de erro, assumimos que o fluxo seguiu para a navegação.
+            // (Num cenário ideal, o FakeViewFactory teria um contador de chamadas 'ShowDialogCalled').
             Assert.AreEqual("", erro, "Não devia ter aparecido mensagem de erro.");
         }
 
         [TestMethod]
         public void Login_ComCredenciaisErradas_DeveMostrarErro()
         {
-            // 1. Arrange - Dados errados
+            // 1. Arrange
             _vm.Username = "hacker";
             _vm.Password = "errada";
 
@@ -59,7 +57,9 @@ namespace POOProjectTests.ViewModelsTest
             _vm.LoginCommand.Execute(null);
 
             // 3. Assert
-            Assert.IsTrue(mensagemCapturada.Contains("Invalid"), "Devia ter mostrado mensagem de credenciais inválidas.");
+            // Aqui é crucial validar que o utilizador foi avisado do erro
+            Assert.IsTrue(mensagemCapturada.Contains("Invalid") || mensagemCapturada.Contains("incorretos"),
+                "Devia ter mostrado mensagem de credenciais inválidas.");
         }
     }
 }
